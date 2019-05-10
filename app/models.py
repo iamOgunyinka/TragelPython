@@ -1,9 +1,11 @@
 from datetime import datetime
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer, \
+    JSONWebSignatureSerializer as JSONSerializer, base64_decode, base64_encode
 from flask import current_app
 from . import db, auth
+from .utils import log_activity
 
 
 class Company(db.Model):
@@ -18,17 +20,27 @@ class Company(db.Model):
     products = db.relationship('Product', backref='company')
 
     def generate_auth_token(self, expires_in=3600):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expires_in)
+        s = TimedSerializer(current_app.config['SECRET_KEY'], expires_in=expires_in)
         return s.dumps({'id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_auth_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = TimedSerializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
         except:
             return None
         return User.query.get(data['id'])
+
+    @staticmethod
+    def import_json(json_object):
+        try:
+            return Company(name=json_object.get('name'),
+                           date_of_creation=datetime.now())
+        except Exception as e:
+            log_activity('EXCEPTION[create_company]', 'SuperUser', 'New Company',
+                         str(e))
+            return None
 
 
 class User(db.Model, UserMixin):
@@ -64,16 +76,11 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False, unique=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
 
-
-class Order(db.Model):
-    __tablename__ = 'orders'
-    id = db.Column(db.Integer, primary_key=True)
-    staff_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
-    date = db.Column(db.DateTime, default=datetime.now)
-    payment_reference = db.Column(db.Text, unique=True, index=False, nullable=False)
-    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
-    items = db.relationship('Item', backref='order', lazy='dynamic',
-                            cascade='all, delete-orphan')
+    @staticmethod
+    def from_json(json_object):
+        product_name = json_object.get('name')
+        product_price = json_object.get('price')
+        return product_name, product_price
 
 
 class Item(db.Model):
@@ -85,25 +92,69 @@ class Item(db.Model):
     quantity = db.Column(db.Integer, default=lambda: 1)
 
 
+class Order(db.Model):
+    __tablename__ = 'orders'
+    id = db.Column(db.Integer, primary_key=True)
+    staff_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
+    date_of_order = db.Column(db.DateTime, default=datetime.now)
+    payment_reference = db.Column(db.Text, unique=True, index=False, nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
+    items = db.relationship('Item', backref='order', lazy='dynamic',
+                            cascade='all, delete-orphan')
+
+    @staticmethod
+    def import_data(order_data):
+        try:
+            payment_reference_id = order_data.get('payment_reference_id')
+            items = []
+            for item in order_data.get('items'):
+                new_item = Item( quantity=item.get('quantity'),
+                                 product_id=item.get('product_id'))
+                items.append( new_item )
+            return payment_reference_id, items
+        except:
+            return None, None
+
+
 class Subscription(db.Model):
     __tablename__ = 'subscriptions'
     id = db.Column(db.Integer, primary_key=True)
+    begin_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
 
-    def generate_subscription_token(self, company_name, expires_in=3600000):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expires_in)
-        return s.dumps({'id': self.company_id, 'company': company_name}) \
-            .decode('utf-8')
+    # we need these builtin functions in order to use the min-max functions
+    # see the decorator implementation: `subscribed`
+    def __lt__(self, other):
+        return self.end_date < other.end_date
+
+    def __gt__(self, other):
+        return self.end_date > other.end_date
+
+    def __le__(self, other):
+        return self.end_date <= other.end_date
+
+    def __ge__(self, other):
+        return self.end_date >= other.end_date
+
+    def __eq__(self, other):
+        return (self.begin_date, self.end_date) == (other.begin_date, other.end_date)
 
     @staticmethod
-    def verify_auth_token(token, company_id):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_in=3600000)
+    def generate_subscription_token(company_id, company_name, from_date, to_date):
+        serializer = JSONSerializer(current_app.config['SECRET_KEY'])
+        obj = {'id': company_id, 'company': company_name, 'from': str(from_date),
+               'to': str(to_date)}
+        return base64_encode(serializer.dumps(obj)).decode('utf-8')
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = JSONSerializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            data_object = base64_decode(s.loads(token).decode('utf-8'))
         except:
-            return None
-        company = Company.query.get(data['id'])
-        return company and company.id == company_id
+            return None, None, None
+        return data_object.get('id'), data_object.get('from'), data_object.get('to')
 
 
 @auth.user_loader
@@ -112,21 +163,3 @@ def load_user(user_id):
 
 
 auth.anonymous_user = Anonymous()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
