@@ -1,7 +1,7 @@
 import unittest
 from werkzeug.exceptions import NotFound
 from app import create_app, db
-from app.models import User, Customer
+from app.models import User, Order
 from .test_client import TestClient
 
 

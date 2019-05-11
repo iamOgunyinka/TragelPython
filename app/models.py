@@ -1,10 +1,10 @@
 from datetime import datetime
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer, \
-    JSONWebSignatureSerializer as JSONSerializer, base64_decode, base64_encode
+from itsdangerous import JSONWebSignatureSerializer as JSONSerializer, \
+    base64_decode, base64_encode
 from flask import current_app
-from . import db, auth
+from . import db
 from .utils import log_activity
 
 
@@ -19,13 +19,13 @@ class Company(db.Model):
                                     lazy='dynamic')
     products = db.relationship('Product', backref='company')
 
-    def generate_auth_token(self, expires_in=3600):
-        s = TimedSerializer(current_app.config['SECRET_KEY'], expires_in=expires_in)
+    def generate_auth_token(self):
+        s = JSONSerializer(current_app.config['SECRET_KEY'])
         return s.dumps({'id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_auth_token(token):
-        s = TimedSerializer(current_app.config['SECRET_KEY'])
+        s = JSONSerializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
         except:
@@ -155,11 +155,3 @@ class Subscription(db.Model):
         except:
             return None, None, None
         return data_object.get('id'), data_object.get('from'), data_object.get('to')
-
-
-@auth.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
-auth.anonymous_user = Anonymous()

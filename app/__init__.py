@@ -18,11 +18,11 @@ def create_app(config_name):
     db.init_app(app)
 
     # register blueprints
-    from .api_v1 import v1_api as api_blueprint
-    app.register_blueprint(api_blueprint, url_prefix='/api/v1')
+    from .api_v1 import v1_api as api
+    app.register_blueprint(api, url_prefix='/api/v1')
 
-    from .login_blueprint import login_api
-    login_api.register_blueprint(login_api, url_prefix='/auth')
+    from .login_blueprint import login_api as lapi
+    app.register_blueprint(lapi, url_prefix='/auth')
 
     # register an after request handler
     @app.after_request
@@ -32,6 +32,3 @@ def create_app(config_name):
         return rv
 
     return app
-
-
-from .auth import auth

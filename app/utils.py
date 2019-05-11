@@ -1,9 +1,15 @@
 from functools import partial
 from flask import url_for as http_url_for, jsonify
 from .decorators import permission_required
-from datetime import datetime, date
+from datetime import date
+import logging, os
+
+log_cfg = os.path.join(os.getcwd(), 'logs', 'all_logs.txt')
+logging.basicConfig(filename=log_cfg, filemode='a+',
+                    format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+
 (SUPER_USER, ADMINISTRATOR, BASIC_USER) = (0x4C, 0x4B, 0x4A)
-https_url_for = partial(http_url_for, _scheme='https', _external=True)
+https_url_for = partial(http_url_for, _scheme='http', _external=True)
 
 
 def admin_required(function):
@@ -57,8 +63,8 @@ def send_error(status, error, message):
     return error_response
 
 
-async def log_activity(event_type, by_, for_, why_, **kwargs):
-    pass
+def log_activity(event_type, by_, for_, why_, **kwargs):
+    logging.error(msg=[event_type, by_, for_, why_], **kwargs)
 
 
 async def send_password_reset(user_id, company_id):

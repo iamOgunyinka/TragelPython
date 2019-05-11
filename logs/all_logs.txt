@@ -1,0 +1,67 @@
+
+11-May-19 16:46:52 -  * Debugger is active!
+11-May-19 16:46:52 -  * Debugger PIN: 308-119-255
+11-May-19 16:46:59 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+11-May-19 16:46:59 -  * Restarting with stat
+11-May-19 16:47:00 -  * Debugger is active!
+11-May-19 16:47:00 -  * Debugger PIN: 308-119-255
+11-May-19 16:47:23 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/validation.py', reloading
+11-May-19 16:47:23 -  * Restarting with stat
+11-May-19 16:47:24 -  * Debugger is active!
+11-May-19 16:47:24 -  * Debugger PIN: 308-119-255
+11-May-19 16:47:40 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/validation.py', reloading
+11-May-19 16:47:40 -  * Restarting with stat
+11-May-19 16:47:41 -  * Debugger is active!
+11-May-19 16:47:41 -  * Debugger PIN: 308-119-255
+11-May-19 16:47:55 - 127.0.0.1 - - [11/May/2019 16:47:55] "POST /auth/login HTTP/1.1" 400 -
+11-May-19 16:48:11 - 127.0.0.1 - - [11/May/2019 16:48:11] "POST /auth/login HTTP/1.1" 400 -
+11-May-19 16:48:49 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/utils.py', reloading
+11-May-19 16:48:50 -  * Restarting with stat
+11-May-19 16:48:51 -  * Debugger is active!
+11-May-19 16:48:51 -  * Debugger PIN: 308-119-255
+11-May-19 16:49:00 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/utils.py', reloading
+11-May-19 16:49:00 -  * Restarting with stat
+11-May-19 16:49:01 -  * Debugger is active!
+11-May-19 16:49:01 -  * Debugger PIN: 308-119-255
+11-May-19 16:49:10 - 127.0.0.1 - - [11/May/2019 16:49:10] "POST /auth/login HTTP/1.1" 400 -
+11-May-19 16:49:48 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/utils.py', reloading
+11-May-19 16:49:48 -  * Restarting with stat
+11-May-19 16:49:49 -  * Debugger is active!
+11-May-19 16:49:49 -  * Debugger PIN: 308-119-255
+11-May-19 16:49:58 - 127.0.0.1 - - [11/May/2019 16:49:58] "POST /auth/login HTTP/1.1" 500 -
+11-May-19 16:50:44 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/utils.py', reloading
+11-May-19 16:50:44 -  * Restarting with stat
+11-May-19 16:50:45 -  * Debugger is active!
+11-May-19 16:50:45 -  * Debugger PIN: 308-119-255
+11-May-19 16:50:56 - ['LOGIN[login_route]', 'iamOgunyinka', 'iamOgunyinka', 'Unable to split username and company name']
+11-May-19 16:50:56 - 127.0.0.1 - - [11/May/2019 16:50:56] "POST /auth/login HTTP/1.1" 400 -
+11-May-19 16:51:18 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/utils.py', reloading
+11-May-19 16:51:18 -  * Restarting with stat
+11-May-19 16:51:19 -  * Debugger is active!
+11-May-19 16:51:19 -  * Debugger PIN: 308-119-255
+11-May-19 16:51:39 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/validation.py', reloading
+11-May-19 16:51:39 -  * Restarting with stat
+11-May-19 16:51:40 -  * Debugger is active!
+11-May-19 16:51:40 -  * Debugger PIN: 308-119-255
+11-May-19 16:52:03 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/validation.py', reloading
+11-May-19 16:52:03 -  * Restarting with stat
+11-May-19 16:52:04 -  * Debugger is active!
+11-May-19 16:52:04 -  * Debugger PIN: 308-119-255
+11-May-19 16:52:08 - ['LOGIN[login_route]', 'iamOgunyinka', 'iamOgunyinka', 'can only concatenate list (not "str") to list']
+11-May-19 16:52:08 - 127.0.0.1 - - [11/May/2019 16:52:08] "POST /auth/login HTTP/1.1" 400 -
+11-May-19 16:52:46 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/validation.py', reloading
+11-May-19 16:52:46 -  * Restarting with stat
+11-May-19 16:52:47 -  * Debugger is active!
+11-May-19 16:52:47 -  * Debugger PIN: 308-119-255
+11-May-19 16:52:56 - ['LOGIN[login_route]', 'iamOgunyinka', 'iamOgunyinka', 'Unable to split username and company name']
+11-May-19 16:52:56 - 127.0.0.1 - - [11/May/2019 16:52:56] "POST /auth/login HTTP/1.1" 400 -
+11-May-19 16:53:47 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/validation.py', reloading
+11-May-19 16:53:47 -  * Restarting with stat
+11-May-19 16:53:48 -  * Debugger is active!
+11-May-19 16:53:48 -  * Debugger PIN: 308-119-255
+11-May-19 16:53:54 - ['LOGIN[login_route]', 'iamOgunyinka', 'iamOgunyinka', 'We could not verify the password']
+11-May-19 16:53:54 - 127.0.0.1 - - [11/May/2019 16:53:54] "POST /auth/login HTTP/1.1" 400 -
+11-May-19 16:54:45 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/validation.py', reloading
+11-May-19 16:54:45 -  * Restarting with stat
+11-May-19 16:54:46 -  * Debugger is active!
+11-May-19 16:54:46 -  * Debugger PIN: 308-119-255
