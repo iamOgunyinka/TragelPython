@@ -1,6 +1,8 @@
 import os
+
 from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
+
 from .decorators import json, no_cache, rate_limit
 
 db = SQLAlchemy()

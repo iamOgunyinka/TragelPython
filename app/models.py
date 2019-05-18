@@ -1,9 +1,11 @@
 from datetime import datetime
+
+from flask import current_app
 from flask_login import UserMixin, AnonymousUserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import JSONWebSignatureSerializer as JSONSerializer, \
     base64_decode, base64_encode
-from flask import current_app
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from . import db
 from .utils import log_activity
 
@@ -52,6 +54,9 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128), nullable=False, index=True)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     role = db.Column(db.SmallInteger, nullable=False)
+
+    def __str__(self):
+        return '<User {}, {}>'.format(self.fullname, self.username)
 
     @property
     def password(self):

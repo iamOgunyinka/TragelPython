@@ -1,9 +1,11 @@
+import base64
+
 from flask import request
 from flask_login import current_user
-import base64
+
 from . import v1_api
-from ..models import db, User
 from ..decorators import json
+from ..models import db, User
 from ..utils import is_all_type, BASIC_USER, SUPER_USER, find_occurrences, \
     https_url_for, send_password_reset, log_activity, send_error, admin_required
 
@@ -80,11 +82,13 @@ def delete_user():
     return {}, 202, {'Message': 'Successful'}
 
 
-@v1_api.route('/change_role/<int:user_id>', methods=['PUT'])
+# @v1_api.route('/change_role/<int:user_id>', methods=['PUT'])
+@v1_api.route('/change_role', methods=['PUT'])
 @admin_required
 @json
-def change_user_role(user_id):
+def change_user_role():
     json_data = request.get_json()
+    user_id = int(request.args.get('user_id'))
     if json_data is None:
         return send_error(400, 'Bad request', 'This request contains invalid or no data')
     user = User.query.get_or_404(user_id)
@@ -99,3 +103,5 @@ def change_user_role(user_id):
         log_activity('SERVER ERROR[change_user_role]', by_='', for_='', why_=str(e))
         return send_error(400, 'Bad request received', 'The data is malformed')
     return {}, 202, {'Message': 'Successful'}
+
+

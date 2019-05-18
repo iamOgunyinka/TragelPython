@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+
 from app import create_app, db
 from app.models import User, Company
 from app.utils import SUPER_USER
@@ -8,6 +9,7 @@ app = create_app(os.environ.get('FLASK_CONFIG', 'development'))
 
 if __name__ == '__main__':
     with app.app_context():
+        print(app.url_map)
         db.create_all()
         if User.query.get(1) is None:
             company = Company(name='Tragel Group')

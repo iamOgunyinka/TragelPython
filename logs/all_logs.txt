@@ -65,3 +65,99 @@
 11-May-19 16:54:45 -  * Restarting with stat
 11-May-19 16:54:46 -  * Debugger is active!
 11-May-19 16:54:46 -  * Debugger PIN: 308-119-255
+18-May-19 16:41:16 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+18-May-19 16:41:17 -  * Restarting with stat
+18-May-19 16:41:26 -  * Debugger is active!
+18-May-19 16:41:27 -  * Debugger PIN: 259-866-092
+18-May-19 16:43:12 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/__init__.py', reloading
+18-May-19 16:43:14 -  * Restarting with stat
+18-May-19 16:43:23 -  * Debugger is active!
+18-May-19 16:43:23 -  * Debugger PIN: 259-866-092
+18-May-19 16:46:50 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/login_blueprint/validation.py', reloading
+18-May-19 16:46:51 -  * Restarting with stat
+18-May-19 16:46:59 -  * Debugger is active!
+18-May-19 16:46:59 -  * Debugger PIN: 259-866-092
+18-May-19 16:47:52 - 127.0.0.1 - - [18/May/2019 16:47:52] "GET /auth/endpoints?company_id= HTTP/1.1" 500 -
+18-May-19 16:49:45 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/auth.py', reloading
+18-May-19 16:49:46 -  * Restarting with stat
+18-May-19 16:49:55 -  * Debugger is active!
+18-May-19 16:49:55 -  * Debugger PIN: 259-866-092
+18-May-19 16:50:47 - 127.0.0.1 - - [18/May/2019 16:50:47] "GET /auth/endpoints?company_id=1 HTTP/1.1" 401 -
+18-May-19 16:55:12 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+18-May-19 16:55:12 -  * Restarting with stat
+18-May-19 16:55:21 -  * Debugger is active!
+18-May-19 16:55:21 -  * Debugger PIN: 335-470-105
+18-May-19 17:02:09 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+18-May-19 17:02:09 -  * Restarting with stat
+18-May-19 17:02:17 -  * Debugger is active!
+18-May-19 17:02:17 -  * Debugger PIN: 335-470-105
+18-May-19 17:02:47 - 127.0.0.1 - - [18/May/2019 17:02:47] "GET /auth/endpoints HTTP/1.1" 401 -
+18-May-19 17:04:00 - 127.0.0.1 - - [18/May/2019 17:04:00] "GET /auth/endpoints HTTP/1.1" 401 -
+18-May-19 17:05:36 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/auth.py', reloading
+18-May-19 17:05:37 -  * Restarting with stat
+18-May-19 17:05:45 -  * Debugger is active!
+18-May-19 17:05:45 -  * Debugger PIN: 335-470-105
+18-May-19 17:06:12 - 127.0.0.1 - - [18/May/2019 17:06:12] "GET /auth/endpoints HTTP/1.1" 401 -
+18-May-19 17:08:01 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/auth.py', reloading
+18-May-19 17:08:02 -  * Restarting with stat
+18-May-19 17:08:10 -  * Debugger is active!
+18-May-19 17:08:10 -  * Debugger PIN: 335-470-105
+18-May-19 17:08:29 - 127.0.0.1 - - [18/May/2019 17:08:29] "GET /auth/endpoints HTTP/1.1" 401 -
+18-May-19 17:09:04 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/auth.py', reloading
+18-May-19 17:09:05 -  * Restarting with stat
+18-May-19 17:09:13 -  * Debugger is active!
+18-May-19 17:09:13 -  * Debugger PIN: 335-470-105
+18-May-19 17:09:30 - 127.0.0.1 - - [18/May/2019 17:09:30] "GET /auth/endpoints HTTP/1.1" 401 -
+18-May-19 17:10:13 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/auth.py', reloading
+18-May-19 17:10:14 -  * Restarting with stat
+18-May-19 17:10:22 -  * Debugger is active!
+18-May-19 17:10:22 -  * Debugger PIN: 335-470-105
+18-May-19 17:10:45 - 127.0.0.1 - - [18/May/2019 17:10:45] "GET /auth/endpoints HTTP/1.1" 500 -
+18-May-19 17:11:16 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/auth.py', reloading
+18-May-19 17:11:18 -  * Restarting with stat
+18-May-19 17:11:26 -  * Debugger is active!
+18-May-19 17:11:26 -  * Debugger PIN: 335-470-105
+18-May-19 17:11:40 - 127.0.0.1 - - [18/May/2019 17:11:40] "GET /auth/endpoints HTTP/1.1" 500 -
+18-May-19 17:12:32 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/auth.py', reloading
+18-May-19 17:12:34 -  * Restarting with stat
+18-May-19 17:12:42 -  * Debugger is active!
+18-May-19 17:12:42 -  * Debugger PIN: 335-470-105
+18-May-19 17:12:56 - 127.0.0.1 - - [18/May/2019 17:12:56] "GET /auth/endpoints HTTP/1.1" 401 -
+18-May-19 20:13:21 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+18-May-19 20:13:21 -  * Restarting with stat
+18-May-19 20:13:22 -  * Debugger is active!
+18-May-19 20:13:22 -  * Debugger PIN: 287-293-992
+18-May-19 20:15:43 - 127.0.0.1 - - [18/May/2019 20:15:43] "GET /auth/endpoints?company_id=00001 HTTP/1.1" 401 -
+18-May-19 20:19:45 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+18-May-19 20:19:45 -  * Restarting with stat
+18-May-19 20:19:46 -  * Debugger is active!
+18-May-19 20:19:46 -  * Debugger PIN: 287-293-992
+18-May-19 20:20:22 - 127.0.0.1 - - [18/May/2019 20:20:22] "GET /auth/endpoints?company_id=0001 HTTP/1.1" 500 -
+18-May-19 20:20:47 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/models.py', reloading
+18-May-19 20:20:47 -  * Restarting with stat
+18-May-19 20:20:48 -  * Debugger is active!
+18-May-19 20:20:48 -  * Debugger PIN: 287-293-992
+18-May-19 20:21:14 - 127.0.0.1 - - [18/May/2019 20:21:14] "GET /auth/endpoints?company_id=0001 HTTP/1.1" 500 -
+18-May-19 20:21:28 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/app/models.py', reloading
+18-May-19 20:21:29 -  * Restarting with stat
+18-May-19 20:21:29 -  * Debugger is active!
+18-May-19 20:21:29 -  * Debugger PIN: 287-293-992
+18-May-19 20:22:04 - 127.0.0.1 - - [18/May/2019 20:22:04] "GET /auth/endpoints?company_id=0001 HTTP/1.1" 401 -
+18-May-19 20:24:50 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+18-May-19 20:24:50 -  * Restarting with stat
+18-May-19 20:24:53 -  * Debugger is active!
+18-May-19 20:24:53 -  * Debugger PIN: 287-293-992
+18-May-19 20:25:18 - 127.0.0.1 - - [18/May/2019 20:25:18] "GET /auth/endpoints?company_id=00001 HTTP/1.1" 500 -
+18-May-19 20:26:43 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/run.py', reloading
+18-May-19 20:26:43 -  * Restarting with stat
+18-May-19 20:26:44 -  * Debugger is active!
+18-May-19 20:26:44 -  * Debugger PIN: 287-293-992
+18-May-19 20:36:04 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+18-May-19 20:36:04 -  * Restarting with stat
+18-May-19 20:36:06 -  * Debugger is active!
+18-May-19 20:36:06 -  * Debugger PIN: 287-293-992
+18-May-19 20:37:01 - 127.0.0.1 - - [18/May/2019 20:37:01] "GET /auth/endpoints?company_id=00001 HTTP/1.1" 500 -
+18-May-19 20:41:10 -  * Detected change in '/home/iamogunyinka/PycharmProjects/TragelPython/run.py', reloading
+18-May-19 20:41:10 -  * Restarting with stat
+18-May-19 20:41:12 -  * Debugger is active!
+18-May-19 20:41:12 -  * Debugger PIN: 287-293-992

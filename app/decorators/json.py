@@ -1,5 +1,6 @@
 import functools
-from flask import jsonify, Response
+
+from flask import jsonify
 
 
 def json(f):

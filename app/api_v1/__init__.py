@@ -1,5 +1,7 @@
 from flask import Blueprint
+
 from ..decorators import etag, rate_limit
+
 v1_api = Blueprint('api', __name__)
 
 

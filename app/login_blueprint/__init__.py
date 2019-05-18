@@ -1,6 +1,6 @@
 from flask import Blueprint
-from ..decorators import rate_limit
 
+from ..decorators import rate_limit
 
 login_api = Blueprint('login', __name__)
 

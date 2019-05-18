@@ -1,9 +1,10 @@
 from flask import request
 from flask_login import login_required, current_user
+
 from . import v1_api as api
 from .. import db
-from ..models import Product
 from ..decorators import json, paginate
+from ..models import Product
 from ..utils import admin_required, send_error, log_activity
 
 

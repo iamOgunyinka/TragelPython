@@ -1,8 +1,11 @@
-from functools import partial
-from flask import url_for as http_url_for, jsonify
-from .decorators import permission_required
+import logging
+import os
 from datetime import date
-import logging, os
+from functools import partial
+
+from flask import url_for as http_url_for, jsonify
+
+from .decorators import permission_required
 
 log_cfg = os.path.join(os.getcwd(), 'logs', 'all_logs.txt')
 logging.basicConfig(filename=log_cfg, filemode='a+',
