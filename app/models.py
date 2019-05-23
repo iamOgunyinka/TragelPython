@@ -1,13 +1,19 @@
 from datetime import datetime
 
 from flask import current_app
-from flask_login import UserMixin, AnonymousUserMixin
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin, AnonymousUserMixin, LoginManager
 from itsdangerous import JSONWebSignatureSerializer as JSONSerializer, \
     base64_decode, base64_encode
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from . import db
 from .utils import log_activity
+
+login_manager = LoginManager()
+db = SQLAlchemy()
+
+login_manager.session_protection = 'strong'
+login_manager.login_view = 'login.login_route'
 
 
 class Company(db.Model):
@@ -21,6 +27,9 @@ class Company(db.Model):
                                     lazy='dynamic')
     products = db.relationship('Product', backref='company')
 
+    def __repr__(self):
+        return '<Company: NAME -> {}, ID -> {}>'.format(self.name, self.id)
+
     def generate_auth_token(self):
         s = JSONSerializer(current_app.config['SECRET_KEY'])
         return s.dumps({'id': self.id}).decode('utf-8')
@@ -32,7 +41,8 @@ class Company(db.Model):
             data = s.loads(token)
         except:
             return None
-        return User.query.get(data['id'])
+        company = User.query.get(data['id'])
+        return company.id if company is not None else None
 
     @staticmethod
     def import_json(json_object):
@@ -55,8 +65,8 @@ class User(db.Model, UserMixin):
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     role = db.Column(db.SmallInteger, nullable=False)
 
-    def __str__(self):
-        return '<User {}, {}>'.format(self.fullname, self.username)
+    def __repr__(self):
+        return '<User {}, {}, {}>'.format(self.fullname, self.username, self.company)
 
     @property
     def password(self):
@@ -71,7 +81,11 @@ class User(db.Model, UserMixin):
 
 
 class Anonymous(AnonymousUserMixin):
-    pass
+    def verify_password(self):
+        return False
+
+    def __repr__(self):
+        return '<Anonymous>'
 
 
 class Product(db.Model):
@@ -160,3 +174,11 @@ class Subscription(db.Model):
         except:
             return None, None, None
         return data_object.get('id'), data_object.get('from'), data_object.get('to')
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+login_manager.anonymous_user = Anonymous

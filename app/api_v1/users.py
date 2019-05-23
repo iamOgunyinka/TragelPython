@@ -7,7 +7,7 @@ from . import v1_api
 from ..decorators import json
 from ..models import db, User
 from ..utils import is_all_type, BASIC_USER, SUPER_USER, find_occurrences, \
-    https_url_for, send_password_reset, log_activity, send_error, admin_required
+    https_url_for, log_activity, send_error, admin_required
 
 
 @v1_api.route('/create_user', methods=['POST'])
@@ -46,13 +46,13 @@ def create_user():
 def reset_password():
     json_data = request.get_json()
     if json_data is None:
-        return send_error(400, 'Bad request',
-                          'This request contains invalid or no data')
-    personal_email = json_data.get('email')
+        return send_error(400, 'Bad request', 'This request contains invalid '
+                                              'or no data')
+    old_password = json_data.get('old_password')
+    new_password = json_data.get('new_password')
     username = json_data.get('username')
-    user = db.session.query(User).filter_by(username=username,
-                                            personal_email=personal_email).first()
-    if user is None:
+    user = db.session.query(User).filter_by(username=username).first()
+    if user is None or user.verify_password(old_password) is False:
         return send_error(404, 'Does not exist',
                           'The user with the information provided does not exist')
     if user.company_id != current_user.company_id:
@@ -60,7 +60,14 @@ def reset_password():
                           'You\'re not allowed to reset this user\'s password')
     log_activity(event_type='PASSWORD RESET[reset_password]',
                  by_=current_user.username, for_=username, why_='')
-    send_password_reset(user.id, user.company_id)
+    user.password = new_password
+    db.session.add(user)
+    try:
+        db.session.commit()
+    except Exception as e:
+        log_activity('PASSWORD RESET[Exception]', current_user.username, user.username,
+                     str(e))
+        return send_error(403, 'Forbidden', 'Invalid operation')
     return {}, 201, {'Login': https_url_for('login_api.login_route')}
 
 

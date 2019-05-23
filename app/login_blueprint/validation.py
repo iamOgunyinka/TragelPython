@@ -1,15 +1,16 @@
-from flask import request
+from flask import request, jsonify
 from flask_login import login_user, logout_user, login_required
 
 from ..auth import su_auth
 from ..decorators import json
 from ..login_blueprint import login_api
-from ..models import User, db
+from ..models import User, Company
 from ..utils import is_all_type, is_valid_string, find_occurrences, \
     https_url_for, send_error, log_activity
 
 
 @login_api.route('/login', methods=['POST'])
+@json
 def login_route():
     login_data = request.get_json()
     if login_data is None:
@@ -24,21 +25,21 @@ def login_route():
                           'You tried to login with invalid credentials')
     try:
         all_at_pos = find_occurrences('@', full_username)
-        company_name = ''
+        company_id = 0
         if len(all_at_pos) > 2:
             username = all_at_pos[0] + '@' + all_at_pos[1]
-            company_name = all_at_pos[2]
+            company_id = int(all_at_pos[2])
         elif len(all_at_pos) == 2:
             username = all_at_pos[0]
-            company_name = all_at_pos[1]
+            company_id = int(all_at_pos[1])
         else:
             username = full_username
-        user = db.session.query(User).filter_by(username=username).first()
+        user = User.query.filter_by(username=username).first()
         if user is None or user.verify_password(password) is False or \
-                user.company.verify_auth_token(company_token) != company_name:
-            raise Exception('We could not verify the password')
+                user.company.verify_auth_token(company_token) != company_id:
+            raise Exception('We could not verify the user\'s credentials')
         login_user(user)
-        return {}, 200, {'Login': https_url_for('login.logout_route')}
+        return {'status': 'OK'}, 200, {'Location': https_url_for('login.logout_route')}
     except Exception as e:
         log_activity('LOGIN[login_route]', by_=full_username, for_=full_username,
                      why_=str(e))
@@ -56,30 +57,36 @@ def logout_route():
 
 @login_api.route('/endpoints', methods=['GET'])
 @su_auth.login_required
-@json
 def get_all_endpoints():
-    response = {'login': https_url_for('login.login_route'),
-                'logout': https_url_for('login.logout_route'),
-                'create_user': https_url_for('api.create_user'),
-                'reset_password': https_url_for('api.reset_password'),
-                'delete_user': https_url_for('api.delete_user'),
-                'change_role': https_url_for('api.change_user_role'),
-                'get_subscriptions': https_url_for('api.get_subscriptions'),
-                'add_subscription': https_url_for('api.add_subscription'),
-                'get_products': https_url_for('api.get_products'),
-                'get_product': https_url_for('api.get_product'),
-                'update_product': https_url_for('api.edit_product'),
-                'add_product': https_url_for('api.new_product'),
-                'get_orders': https_url_for('api.get_orders'),
-                'get_customer_order': https_url_for('api.get_customer_orders'),
-                'add_order': https_url_for('api.new_customer_order'),
-                'remove_order': https_url_for('api.delete_order'),
-                'ping': https_url_for('login.echo_ping')
-                }
+    company_id = request.args.get('company_id')
+    company = Company.query.get(company_id)
+    company_token = '' if company is None else company.generate_auth_token()
+    response = jsonify({'login': https_url_for('login.login_route'),
+                        'logout': https_url_for('login.logout_route'),
+                        'create_user': https_url_for('api.create_user'),
+                        'reset_password': https_url_for('api.reset_password'),
+                        'delete_user': https_url_for('api.delete_user'),
+                        'change_role': https_url_for('api.change_user_role'),
+                        'get_subscriptions': https_url_for('api.get_subscriptions'),
+                        'add_subscription': https_url_for('api.add_subscription'),
+                        'get_products': https_url_for('api.get_products'),
+                        'get_product': https_url_for('api.get_product', product_id=0),
+                        'update_product': https_url_for('api.edit_product',
+                                                        product_id=0),
+                        'add_product': https_url_for('api.new_product'),
+                        'get_orders': https_url_for('api.get_orders'),
+                        'get_customer_order': https_url_for('api.get_customer_orders',
+                                                            order_id=0),
+                        'add_order': https_url_for('api.new_customer_order'),
+                        'remove_order': https_url_for('api.delete_order', order_id=0),
+                        'ping': https_url_for('login.echo_ping'),
+                        'company_id': company_id, 'company_token': company_token
+                        })
+    response.status_code = 200
     return response
 
 
 @login_api.route('/ping', methods=['GET'])
 @json
 def echo_ping():
-    return {}, 200, {'Message': 'OK'}
+    return {'status': 'OK'}, 200, {}

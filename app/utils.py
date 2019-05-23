@@ -48,16 +48,7 @@ def is_all_type(list_of_values, value_type: type):
 
 
 def find_occurrences(substring: str, whole_string: str) -> list:
-    start = 0
-    found = []
-    index = whole_string.find(substring, start)
-    while index != -1:
-        store = whole_string[start:index]
-        if len(store) > 0:
-            found.append(store)
-        start = index + 1
-        index = whole_string.find(substring, start)
-    return found
+    return whole_string.split(substring)
 
 
 def send_error(status, error, message):
@@ -68,7 +59,3 @@ def send_error(status, error, message):
 
 def log_activity(event_type, by_, for_, why_, **kwargs):
     logging.error(msg=[event_type, by_, for_, why_], **kwargs)
-
-
-async def send_password_reset(user_id, company_id):
-    pass

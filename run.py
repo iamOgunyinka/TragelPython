@@ -9,13 +9,12 @@ app = create_app(os.environ.get('FLASK_CONFIG', 'development'))
 
 if __name__ == '__main__':
     with app.app_context():
-        print(app.url_map)
         db.create_all()
         if User.query.get(1) is None:
             company = Company(name='Tragel Group')
             super_user = User(fullname='Joshua', username='iamOgunyinka',
                               personal_email='ogunyinkajoshua@yahoo.com',
-                              password='password',role=SUPER_USER)
+                              password='password',role=SUPER_USER, )
             company.staffs.append(super_user)
             db.session.add(company)
             db.session.add(super_user)

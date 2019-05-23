@@ -1,11 +1,9 @@
 import os
 
 from flask import Flask, g
-from flask_sqlalchemy import SQLAlchemy
 
 from .decorators import json, no_cache, rate_limit
-
-db = SQLAlchemy()
+from .models import db, login_manager
 
 
 def create_app(config_name):
@@ -18,13 +16,14 @@ def create_app(config_name):
 
     # initialize extensions
     db.init_app(app)
+    login_manager.init_app(app)
 
     # register blueprints
     from .api_v1 import v1_api as api
     app.register_blueprint(api, url_prefix='/api/v1')
 
-    from .login_blueprint import login_api as lapi
-    app.register_blueprint(lapi, url_prefix='/auth')
+    from .login_blueprint import login_api
+    app.register_blueprint(login_api, url_prefix='/auth')
 
     # register an after request handler
     @app.after_request
