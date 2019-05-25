@@ -10,7 +10,6 @@ from ..utils import is_all_type, is_valid_string, find_occurrences, \
 
 
 @login_api.route('/login', methods=['POST'])
-@json
 def login_route():
     login_data = request.get_json()
     if login_data is None:
@@ -39,7 +38,9 @@ def login_route():
                 user.company.verify_auth_token(company_token) != company_id:
             raise Exception('We could not verify the user\'s credentials')
         login_user(user)
-        return {'status': 'OK'}, 200, {'Location': https_url_for('login.logout_route')}
+        response = jsonify({'message': 'Logged in', 'status': 200 })
+        response.status_code = 200
+        return response
     except Exception as e:
         log_activity('LOGIN[login_route]', by_=full_username, for_=full_username,
                      why_=str(e))

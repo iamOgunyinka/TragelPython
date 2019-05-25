@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from flask import current_app
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager
+from flask_sqlalchemy import SQLAlchemy
 from itsdangerous import JSONWebSignatureSerializer as JSONSerializer, \
     base64_decode, base64_encode
 from werkzeug.security import generate_password_hash, check_password_hash

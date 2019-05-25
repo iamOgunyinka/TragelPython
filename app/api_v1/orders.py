@@ -7,7 +7,7 @@ from . import v1_api as api
 from .. import db
 from ..decorators import json, paginate
 from ..models import Order
-from ..utils import admin_required, send_error, log_activity
+from ..utils import admin_required, send_error, log_activity, date_from_string
 
 
 @api.route('/orders/', methods=['GET'])
@@ -15,7 +15,20 @@ from ..utils import admin_required, send_error, log_activity
 @admin_required
 @paginate('orders')
 def get_orders():
-    return db.session.query(Order).filter_by(company_id=current_user.company_id).all()
+    date_to_use = date_from_string(request.args.get('date'))
+    date_from = date_from_string(request.args.get('from'))
+    date_to = date_from_string(request.args.get('to'))
+
+    if date_from is None or date_to is None:
+        if date_to_use is None:
+            return db.session.query(Order)\
+                .filter_by(company_id=current_user.company_id).all()
+        else:
+            return Order.query.filter_by(date_of_order=date_to_use,
+                                         company_id=current_user.company_id).all()
+    else:
+        return Order.query.filter(Order.date_of_order >= date_from,
+                                  Order.date_of_order <= date_to).all()
 
 
 @api.route('/orders/<int:order_id>', methods=['GET'])
