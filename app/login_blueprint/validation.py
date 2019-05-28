@@ -80,6 +80,7 @@ def get_all_endpoints():
                                                             order_id=0),
                         'add_order': https_url_for('api.new_customer_order'),
                         'remove_order': https_url_for('api.delete_order', order_id=0),
+                        'upload_images': https_url_for('api.upload_image_route'),
                         'ping': https_url_for('login.echo_ping'),
                         'company_id': company_id, 'company_token': company_token
                         })

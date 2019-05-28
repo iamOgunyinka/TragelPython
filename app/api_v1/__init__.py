@@ -1,8 +1,9 @@
 from flask import Blueprint
-
+from flask_uploads import IMAGES, UploadSet
 from ..decorators import etag, rate_limit
 
 v1_api = Blueprint('api', __name__)
+images = UploadSet('photos', IMAGES)
 
 
 @v1_api.before_request
@@ -19,4 +20,4 @@ def after_request(rv):
     return rv
 
 
-from . import products, orders, users, company, subscription
+from . import products, orders, users, company, subscription, uploads

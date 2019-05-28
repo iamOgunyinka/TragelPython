@@ -22,13 +22,13 @@ def get_orders():
     if date_from is None or date_to is None:
         if date_to_use is None:
             return db.session.query(Order)\
-                .filter_by(company_id=current_user.company_id).all()
+                .filter_by(company_id=current_user.company_id)
         else:
             return Order.query.filter_by(date_of_order=date_to_use,
-                                         company_id=current_user.company_id).all()
+                                         company_id=current_user.company_id)
     else:
         return Order.query.filter(Order.date_of_order >= date_from,
-                                  Order.date_of_order <= date_to).all()
+                                  Order.date_of_order <= date_to)
 
 
 @api.route('/orders/<int:order_id>', methods=['GET'])

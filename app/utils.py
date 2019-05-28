@@ -4,6 +4,7 @@ from datetime import date
 from functools import partial
 
 from flask import url_for as http_url_for, jsonify
+from flask_uploads import UploadNotAllowed
 
 from .decorators import permission_required
 
@@ -59,3 +60,17 @@ def send_error(status, error, message):
 
 def log_activity(event_type, by_, for_, why_, **kwargs):
     logging.error(msg=[event_type, by_, for_, why_], **kwargs)
+
+
+def upload(upload_object, request_object, company_id, data) -> dict:
+    print(request_object.files)
+    if data in request_object.files:
+        try:
+            filename = upload_object.save(request_object.files[data],
+                                          folder=str(company_id))
+            url = upload_object.url(filename)
+            url = url.replace('http', 'https', 1) if url.startswith('http') else url
+            return {'url': url}
+        except UploadNotAllowed:
+            return {'error': 'Upload type not allowed'}
+    return {'error': 'Image contain invalid data'}
