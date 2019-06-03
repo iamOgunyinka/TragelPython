@@ -1,6 +1,6 @@
 import functools
 
-from flask import jsonify
+from flask import jsonify, Response
 
 
 def json(f):
@@ -21,9 +21,11 @@ def json(f):
         if isinstance(status, (dict, list)):
             headers, status = status, None
 
-        # if the response was a database model, then convert it to a
-        # dictionary
-        if not isinstance(rv, dict):
+        # if the response is of type flask.Response, then convert it to a json
+        if isinstance(rv, Response):
+            rv = rv.json
+        # if the response was a database model, then convert it to a dict
+        elif not isinstance(rv, dict):
             rv = rv.to_json()
 
         # generate the JSON response

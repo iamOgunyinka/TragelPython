@@ -67,7 +67,7 @@ def get_all_endpoints():
                         'create_user': https_url_for('api.create_user'),
                         'reset_password': https_url_for('api.reset_password'),
                         'delete_user': https_url_for('api.delete_user'),
-                        'change_role': https_url_for('api.change_user_role'),
+                        'change_role': https_url_for('api.change_user_role', user_id=0),
                         'get_subscriptions': https_url_for('api.get_subscriptions'),
                         'add_subscription': https_url_for('api.add_subscription'),
                         'get_products': https_url_for('api.get_products'),

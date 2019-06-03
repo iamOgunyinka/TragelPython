@@ -7,7 +7,7 @@ from itsdangerous import JSONWebSignatureSerializer as JSONSerializer, \
     base64_decode, base64_encode
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .utils import log_activity
+from .utils import log_activity, https_url_for
 
 login_manager = LoginManager()
 db = SQLAlchemy()
@@ -59,8 +59,9 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     fullname = db.Column(db.String(128), nullable=False)
-    username = db.Column(db.String(64), index=True)
+    username = db.Column(db.String(64), index=True, unique=True, nullable=False)
     personal_email = db.Column(db.String(128), index=True, unique=True)
+    address = db.Column(db.String(128), index=False, nullable=True)
     password_hash = db.Column(db.String(128), nullable=False, index=True)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     role = db.Column(db.SmallInteger, nullable=False)
@@ -91,15 +92,33 @@ class Anonymous(AnonymousUserMixin):
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, nullable=False)
+    name = db.Column(db.String(64), index=True, nullable=False, unique=True)
     price = db.Column(db.Float, nullable=False, unique=False)
+    thumbnail = db.Column(db.String(128), nullable=True, unique=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
 
     @staticmethod
-    def from_json(json_object):
-        product_name = json_object.get('name')
-        product_price = json_object.get('price')
-        return product_name, product_price
+    def from_json(json_data, company_id):
+        items = []
+        if json_data is None: return json_data
+        for json_object in json_data:
+            product_name = json_object.get('name')
+            product_price = json_object.get('price')
+            thumbnail_url = json_object.get('thumbnail', '')
+            items.append(Product(name=product_name, price=product_price,
+                                 thumbnail=thumbnail_url, company_id=company_id))
+        return items
+
+    def to_json(self):
+        return {
+            'name': self.name, 'price': self.price,
+            'thumbnail': self.thumbnail, 'id': self.id,
+            'url': https_url_for('api.get_product', product_id=self.id),
+        }
+
+    def __repr__(self):
+        return '<Product: Company -> {}, Name -> {}, Price -> {}>'\
+            .format(self.company_id, self.name, self.price)
 
 
 class Item(db.Model):
@@ -109,6 +128,12 @@ class Item(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'),
                            index=True)
     quantity = db.Column(db.Integer, default=lambda: 1)
+
+    def to_json(self):
+        return {
+            'product': Product.query.get(self.product_id).name,
+            'quantity': self.quantity
+        }
 
 
 class Order(db.Model):
@@ -127,12 +152,20 @@ class Order(db.Model):
             payment_reference_id = order_data.get('payment_reference_id')
             items = []
             for item in order_data.get('items'):
-                new_item = Item( quantity=item.get('quantity'),
-                                 product_id=item.get('product_id'))
-                items.append( new_item )
+                new_item = Item(quantity=item.get('quantity'),
+                                product_id=item.get('product_id'))
+                items.append(new_item)
             return payment_reference_id, items
         except:
             return None, None
+
+    def to_json(self):
+        return {
+            'id': self.id, 'staff': User.query.get(self.staff_id).username,
+            'payment_reference': self.payment_reference,
+            'date': self.date_of_order.isoformat(),
+            'items': [item.to_json() for item in self.items]
+        }
 
 
 class Subscription(db.Model):
