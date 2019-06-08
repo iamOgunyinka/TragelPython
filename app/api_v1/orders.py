@@ -39,24 +39,25 @@ def get_customer_orders(order_id):
                                              id=order_id).first()
 
 
-@api.route('/create_order', methods=['POST'])
+@api.route('/orders/', methods=['POST'])
 @login_required
 @json
 def new_customer_order():
     order_data = request.get_json()
     if order_data is None:
         return send_error(400, 'Bad request', 'This request contains invalid or no data')
-    payment_id, order_object = Order.import_data(order_data)
-    if payment_id is None or order_object is None:
+    payment_id, order_list = Order.import_data(order_data)
+    if payment_id is None or order_list is None:
         return send_error(400, 'Bad request', 'Missing data in order form')
     new_order = Order(staff_id=current_user.id, date_of_order=datetime.now(),
                       payment_reference=payment_id,
-                      company_id=current_user.company_id, items=order_object)
+                      company_id=current_user.company_id, items=order_list)
     try:
         db.session.add(new_order)
         db.session.commit()
-        return {}, 201, {'Message': 'Successful'}
+        return {'message': 'Successful'}, 201, {}
     except Exception as e:
+        db.session.rollback()
         log_activity('EXCEPTION[new_customer_order]', current_user.username,'',
                      str(e))
         return send_error(404, 'Bad request', 'There was an error processing '
@@ -72,6 +73,6 @@ def delete_order(order_id):
     if order is not None:
         db.session.delete(order)
         db.session.commit()
-        return {}
+        return {'status': 'OK'}, 200, {}
     return send_error(404, 'Bad request',
                       'There was an error processing the data sent in your request')

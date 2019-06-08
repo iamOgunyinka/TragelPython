@@ -150,18 +150,18 @@ class Order(db.Model):
     def import_data(order_data):
         try:
             payment_reference_id = order_data.get('payment_reference_id')
-            items = []
+            order_list = []
             for item in order_data.get('items'):
                 new_item = Item(quantity=item.get('quantity'),
                                 product_id=item.get('product_id'))
-                items.append(new_item)
-            return payment_reference_id, items
+                order_list.append(new_item)
+            return payment_reference_id, order_list
         except:
             return None, None
 
     def to_json(self):
         return {
-            'id': self.id, 'staff': User.query.get(self.staff_id).username,
+            'id': self.id, 'staff': User.query.get(self.staff_id).fullname,
             'payment_reference': self.payment_reference,
             'date': self.date_of_order.isoformat(),
             'items': [item.to_json() for item in self.items]
