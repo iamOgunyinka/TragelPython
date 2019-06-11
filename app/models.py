@@ -130,9 +130,10 @@ class Item(db.Model):
     quantity = db.Column(db.Integer, default=lambda: 1)
 
     def to_json(self):
+        product = Product.query.get(self.product_id)
         return {
-            'product': Product.query.get(self.product_id).name,
-            'quantity': self.quantity
+            'product': product.name, 'quantity': self.quantity,
+            'price': product.price
         }
 
 

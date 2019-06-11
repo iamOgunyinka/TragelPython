@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import request
 from flask_login import login_required, current_user
+from sqlalchemy import Date, cast
 
 from . import v1_api as api
 from .. import db
@@ -24,11 +25,11 @@ def get_orders():
             return db.session.query(Order)\
                 .filter_by(company_id=current_user.company_id)
         else:
-            return Order.query.filter_by(date_of_order=date_to_use,
-                                         company_id=current_user.company_id)
+            return Order.query.filter(cast(Order.date_of_order, Date) == date_to_use,
+                                      Order.company_id == current_user.company_id)
     else:
-        return Order.query.filter(Order.date_of_order >= date_from,
-                                  Order.date_of_order <= date_to)
+        return Order.query.filter(cast(Order.date_of_order, Date) >= date_from,
+                                  cast(Order.date_of_order, Date) <= date_to)
 
 
 @api.route('/orders/<int:order_id>', methods=['GET'])
@@ -64,10 +65,12 @@ def new_customer_order():
                                               'the data sent in your request')
 
 
-@api.route('/orders/<int:order_id>', methods=['DELETE'])
+@api.route('/orders/', methods=['DELETE'])
 @admin_required
 @json
-def delete_order(order_id):
+def delete_order():
+    order_id = request.args.get('order_id', 0)
+    reason = request.args.get('reason', '')
     order = db.session.query(Order).filter_by(company_id=current_user.company_id,
                                               id=order_id).first()
     if order is not None:
