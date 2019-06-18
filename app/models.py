@@ -69,6 +69,12 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return '<User {}, {}, {}>'.format(self.fullname, self.username, self.company)
 
+    def to_json(self):
+        return {
+            'id': self.id, 'name': self.fullname, 'username': self.username,
+            'role': self.role
+        }
+
     @property
     def password(self):
         raise AttributeError('Cannot get password in plain text')
@@ -105,8 +111,16 @@ class Product(db.Model):
             product_name = json_object.get('name')
             product_price = json_object.get('price')
             thumbnail_url = json_object.get('thumbnail', '')
-            items.append(Product(name=product_name, price=product_price,
-                                 thumbnail=thumbnail_url, company_id=company_id))
+            product_id = int(json_object.get('id', 0))
+            product = Product.query.get(product_id)
+            if product is None:
+                product = Product()
+            product.name = product_name
+            product.price = float(product_price)
+            if len(thumbnail_url) != 0:
+                product.thumbnail = thumbnail_url
+            product.company_id = company_id
+            items.append(product)
         return items
 
     def to_json(self):

@@ -13,7 +13,7 @@ from ..utils import send_error, log_activity, SUPER_USER
 @permission_required(SUPER_USER)
 @paginate('companies')
 def get_companies():
-    return Company.query
+    return Company.query.order_by(Company.id)
 
 
 @api.route('/companies/<int:company_id>', methods=['GET'])

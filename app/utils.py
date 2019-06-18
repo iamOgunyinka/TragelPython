@@ -20,12 +20,12 @@ def admin_required(function):
     return permission_required(ADMINISTRATOR)(function)
 
 
-def date_from_string(text):
+def date_from_string(text, default_date):
     if text is None:
-        return text
+        return default_date
     split_text_string = text.split('-')
     if len(split_text_string) < 3:
-        return None
+        return default_date
     (year, month, day) = (int(split_text_string[0]),
                           int(split_text_string[1]),
                           int(split_text_string[2]))
@@ -33,7 +33,7 @@ def date_from_string(text):
         new_date = date(year, month, day)
         return new_date
     except ValueError:
-        return None
+        return default_date
 
 
 def is_valid_string(list_of_values):

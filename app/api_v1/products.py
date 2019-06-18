@@ -13,7 +13,8 @@ from ..utils import admin_required, send_error, log_activity
 @json
 @paginate('products')
 def get_products():
-    return db.session.query(Product).filter_by(company_id=current_user.company_id)
+    return db.session.query(Product).filter_by(company_id=current_user.company_id)\
+        .order_by(Product.id)
 
 
 @api.route('/products/<int:product_id>', methods=['GET'])
@@ -52,6 +53,7 @@ def new_product():
     if items is None:
         return send_error(400, 'Missing data',
                           'There are some missing data in the request')
+    print(items)
     try:
         db.session.add_all(items)
         db.session.commit()

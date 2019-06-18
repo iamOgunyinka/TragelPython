@@ -4,7 +4,7 @@ from flask import request, jsonify
 from flask_login import current_user
 
 from . import v1_api
-from ..decorators import json
+from ..decorators import json, paginate
 from ..models import db, User
 from ..utils import is_all_type, BASIC_USER, SUPER_USER, find_occurrences, \
     https_url_for, log_activity, send_error, admin_required
@@ -34,7 +34,8 @@ def create_user():
         password = data_list[1]
     except Exception as e:
         log_activity('EXCEPTION[create_user]', current_user.username, '', str(e))
-        return send_error(400, 'Bad request', 'This request contains invalid or no data')
+        return send_error(400, 'Bad request',
+                          'This request contains invalid or no data')
 
     user = User(username=username, password=password, personal_email=personal_email,
                 role=role, company_id=current_user.company_id, fullname=fullname)
@@ -75,8 +76,8 @@ def reset_password():
     try:
         db.session.commit()
     except Exception as e:
-        log_activity('PASSWORD RESET[Exception]', current_user.username, user.username,
-                     str(e))
+        log_activity('PASSWORD RESET[Exception]', current_user.username,
+                     user.username, str(e))
         return send_error(403, 'Forbidden', 'Invalid operation')
     return {'Login': https_url_for('login_api.login_route')}, 201, {}
 
@@ -87,16 +88,20 @@ def reset_password():
 def delete_user():
     reason = base64.b64decode(request.args.get('reason'))
     username = request.args.get('username')
+    admin_password = request.args.get('password')
     company_id = current_user.company_id
-    log_activity(event_type='DELETE[delete_user]', by_=current_user.username,
-                 for_=username, why_=reason)
+
+    if not current_user.verify_password(admin_password):
+        return send_error(400, 'Invalid credential', 'Password is incorrect')
     user = db.session.query(User).filter_by(username=username, company_id=company_id)
     if user is None:
         return send_error(404, 'Does not exist',
                           'The user with the information provided does not exist')
     db.session.delete(user)
     db.session.commit()
-    return {}, 202, {'Message': 'Successful'}
+    log_activity(event_type='DELETE[delete_user]', by_=current_user.username,
+                 for_=username, why_=reason)
+    return {'message': 'Successful'}, 202, {}
 
 
 @v1_api.route('/change_role/<int:user_id>', methods=['PUT'])
@@ -105,7 +110,8 @@ def delete_user():
 def change_user_role(user_id):
     json_data = request.get_json()
     if json_data is None:
-        return send_error(400, 'Bad request', 'This request contains invalid or no data')
+        return send_error(400, 'Bad request',
+                          'This request contains invalid or no data')
     user = User.query.get_or_404(user_id)
     if not user or user.company_id != current_user.company_id:
         return send_error(404, 'Does not exist',
@@ -120,3 +126,11 @@ def change_user_role(user_id):
     return {}, 202, {'Message': 'Successful'}
 
 
+@v1_api.route('/list_users', methods=['GET'])
+@admin_required
+@json
+@paginate("users", 100)
+def list_users():
+    if current_user.role != SUPER_USER:
+        return User.query.filter_by(company_id=current_user.company_id)
+    return User.query.filter_by(company_id=current_user.company_id, role=BASIC_USER)

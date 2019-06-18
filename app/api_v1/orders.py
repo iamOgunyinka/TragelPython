@@ -16,20 +16,14 @@ from ..utils import admin_required, send_error, log_activity, date_from_string
 @admin_required
 @paginate('orders')
 def get_orders():
-    date_to_use = date_from_string(request.args.get('date'))
-    date_from = date_from_string(request.args.get('from'))
-    date_to = date_from_string(request.args.get('to'))
-
-    if date_from is None or date_to is None:
-        if date_to_use is None:
-            return db.session.query(Order)\
-                .filter_by(company_id=current_user.company_id)
-        else:
-            return Order.query.filter(cast(Order.date_of_order, Date) == date_to_use,
-                                      Order.company_id == current_user.company_id)
-    else:
-        return Order.query.filter(cast(Order.date_of_order, Date) >= date_from,
-                                  cast(Order.date_of_order, Date) <= date_to)
+    today = datetime.now().date()
+    date_from = date_from_string(request.args.get('from'), today)
+    date_to = date_from_string(request.args.get('to'), today)
+    if request.args.get("all") is not None:
+        return Order.query
+    return Order.query.filter(cast(Order.date_of_order, Date) >= date_from,
+                              cast(Order.date_of_order, Date) <= date_to)\
+        .order_by(Order.date_of_order.desc())
 
 
 @api.route('/orders/<int:order_id>', methods=['GET'])

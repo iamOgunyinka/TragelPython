@@ -2,9 +2,12 @@ import os
 
 from flask import Flask, g
 from flask_uploads import configure_uploads, patch_request_class
+from flask_migrate import Migrate
 
 from .decorators import json, no_cache, rate_limit
 from .models import db, login_manager
+
+migrate = Migrate()
 
 
 def create_app(config_name):
@@ -19,6 +22,7 @@ def create_app(config_name):
     # initialize extensions
     db.init_app(app)
     login_manager.init_app(app)
+    migrate.init_app(app, db)
 
     # register blueprints
     from .api_v1 import v1_api as api
