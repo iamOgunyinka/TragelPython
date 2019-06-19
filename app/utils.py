@@ -13,7 +13,7 @@ logging.basicConfig(filename=log_cfg, filemode='a+',
                     format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
 (SUPER_USER, ADMINISTRATOR, BASIC_USER) = (0x4C, 0x4B, 0x4A)
-https_url_for = partial(http_url_for, _scheme='http', _external=True)
+https_url_for = partial(http_url_for, _scheme='https', _external=True)
 
 
 def admin_required(function):
@@ -52,10 +52,10 @@ def find_occurrences(substring: str, whole_string: str) -> list:
     return whole_string.split(substring)
 
 
-def send_error(status, error, message):
-    error_response = jsonify({'status': status, 'error': error, 'message': message})
-    error_response.status_code = status
-    return error_response
+def send_response(status_code, status, message=''):
+    response = jsonify({'status': status, 'message': message})
+    response.status_code = status_code
+    return response
 
 
 def log_activity(event_type, by_, for_, why_, **kwargs):
@@ -69,7 +69,8 @@ def upload(upload_object, request_object, company_id, data) -> dict:
             filename = upload_object.save(request_object.files[data],
                                           folder=str(company_id))
             url = upload_object.url(filename)
-            # url = url.replace('http', 'https', 1) if url.startswith('http') else url
+            if not url.startswith('https'):
+                url = url.replace('http', 'https', 1)
             return {'url': url}
         except UploadNotAllowed:
             return {'error': 'Upload type not allowed'}

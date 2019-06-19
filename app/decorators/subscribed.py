@@ -10,16 +10,16 @@ def subscribed():
         @wraps(function)
         def decorated_function(*args, **kwargs):
             if not current_user:
-                response = jsonify({'status': 430, 'error': 'Permission denied',
+                response = jsonify({'status': 401, 'error': 'Permission denied',
                                     'message': 'Unable to get required permission '
                                                'for this request'})
-                response.status_code = 430
+                response.status_code = 401
                 return response
             if datetime.now() > max(current_user.company.subscriptions):
-                response = jsonify({'status': 431, 'error': 'Permission denied',
+                response = jsonify({'status': 401, 'error': 'Permission denied',
                                     'message': 'You do not have any active '
                                                'subscription'})
-                response.status_code = 431
+                response.status_code = 401
                 return response
             return function(*args, **kwargs)
         return decorated_function

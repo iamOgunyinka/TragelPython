@@ -1,16 +1,15 @@
-from flask import request
+from flask import request, jsonify
 from flask_login import login_required, current_user
 
 from . import v1_api as api
 from .. import db
-from ..decorators import json, paginate
+from ..decorators import paginate
 from ..models import Product
-from ..utils import admin_required, send_error, log_activity
+from ..utils import admin_required, send_response, log_activity
 
 
 @api.route('/products/', methods=['GET'])
 @admin_required
-@json
 @paginate('products')
 def get_products():
     return db.session.query(Product).filter_by(company_id=current_user.company_id)\
@@ -19,14 +18,13 @@ def get_products():
 
 @api.route('/products/<int:product_id>', methods=['GET'])
 @login_required
-@json
 def get_product(product_id):
-    return Product.query.get_or_404(product_id)
+    product = Product.query.get_or_404(product_id).first()
+    return jsonify(product.to_json()) if product else send_response(404, 'Product not found')
 
 
 @api.route('/products/<int:product_id>', methods=['PUT'])
 @admin_required
-@json
 def edit_product(product_id):
     product = db.session.query(Product).filter_by(id=product_id,
                                                   company_id=current_user.company_id)\
@@ -41,24 +39,21 @@ def edit_product(product_id):
     except Exception as e:
         db.session.rollback()
         log_activity('EXCEPTION[edit_product]', current_user.username, '', str(e))
-        return send_error(402, 'Bad request', 'An exception occurred with your request')
-    return {'status': 'OK'}, 200, {}
+        return send_response(402, 'An exception occurred with your request')
+    return send_response(200, 'OK')
 
 
 @api.route('/products/', methods=['POST'])
 @admin_required
-@json
 def new_product():
     items = Product.from_json(request.get_json(), current_user.company_id)
     if items is None:
-        return send_error(400, 'Missing data',
-                          'There are some missing data in the request')
-    print(items)
+        return send_response(417, 'There are some missing data in the request')
     try:
         db.session.add_all(items)
         db.session.commit()
     except Exception as e:
         db.session.rollback()
         log_activity('EXCEPTION[new_products]', current_user.username, [items], str(e))
-        return send_error(403, 'Database error', 'Unable to add products')
-    return {'status': 'OK'}, 201, {}
+        return send_response(403, 'Unable to add products')
+    return send_response(200, 'Products added')

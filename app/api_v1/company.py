@@ -1,15 +1,14 @@
-from flask import request
+from flask import request, jsonify
 from flask_login import current_user
 
 from . import v1_api as api
 from .. import db
-from ..decorators import json, paginate, permission_required
+from ..decorators import paginate, permission_required
 from ..models import Company
-from ..utils import send_error, log_activity, SUPER_USER
+from ..utils import send_response, log_activity, SUPER_USER
 
 
 @api.route('/companies/', methods=['GET'])
-@json
 @permission_required(SUPER_USER)
 @paginate('companies')
 def get_companies():
@@ -18,29 +17,29 @@ def get_companies():
 
 @api.route('/companies/<int:company_id>', methods=['GET'])
 @permission_required(SUPER_USER)
-@json
 def get_company(company_id):
     return Company.query.get_or_404(company_id)
 
 
 @api.route('/companies', methods=['POST'])
 @permission_required(SUPER_USER)
-@json
 def create_new_company():
     company = Company.import_json(request.json)
     if company is None:
-        return send_error(404, 'Bad request', 'Unable to get the JSON data needed')
+        return send_response(404, 'Bad request', 'Unable to get the JSON data needed')
     db.session.add(company)
     db.session.commit()
-    return {}, 202, {'Message': 'Successful'}
+
+    return send_response(200, 'Successful', 'Successful')
 
 
 @api.route('/companies/<int:company_id>', methods=['DELETE'])
 @permission_required(SUPER_USER)
-@json
 def delete_company(company_id):
-    company = Company.query.get_or_404(company_id)
-    log_activity('DELETE[delete_company]', current_user.username, company.name, '')
+    company = Company.query.get(company_id)
+    if not company:
+        return send_response(404, 'Company not found', '')
     db.session.delete(company)
     db.session.commit()
-    return {}
+    log_activity('DELETE[delete_company]', current_user.username, company.name, '')
+    return send_response(200, 'Successful', 'OK')

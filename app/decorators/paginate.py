@@ -1,9 +1,9 @@
 import functools
 
-from flask import url_for, request
+from flask import url_for, request, jsonify
 
 
-def paginate(collection, max_per_page=50):
+def paginate(collection, max_per_page=25):
     """Generate a paginated response for a resource collection.
 
     Routes that use this decorator must return a SQLAlchemy query as a
@@ -58,6 +58,6 @@ def paginate(collection, max_per_page=50):
             results = [item.to_json() for item in p.items]
 
             # return a dictionary as a response
-            return {collection: results, 'pages': pages}
+            return jsonify({collection: results, 'pages': pages})
         return wrapped
     return decorator

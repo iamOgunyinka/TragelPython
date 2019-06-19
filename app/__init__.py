@@ -1,10 +1,10 @@
 import os
 
 from flask import Flask, g
-from flask_uploads import configure_uploads, patch_request_class
 from flask_migrate import Migrate
+from flask_uploads import configure_uploads, patch_request_class
 
-from .decorators import json, no_cache, rate_limit
+from .decorators import no_cache, rate_limit
 from .models import db, login_manager
 
 migrate = Migrate()

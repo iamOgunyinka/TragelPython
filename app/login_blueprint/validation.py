@@ -2,26 +2,24 @@ from flask import request, jsonify
 from flask_login import login_user, logout_user, login_required
 
 from ..auth import su_auth
-from ..decorators import json
 from ..login_blueprint import login_api
 from ..models import User, Company
 from ..utils import is_all_type, is_valid_string, find_occurrences, \
-    https_url_for, send_error, log_activity
+    https_url_for, send_response, log_activity
 
 
 @login_api.route('/login', methods=['POST'])
 def login_route():
     login_data = request.get_json()
     if login_data is None:
-        return send_error(400, 'Bad request', 'Invalid data sent for login')
+        return send_response(400, 'Invalid data sent for login')
     full_username = login_data.get('username')
     password = login_data.get('password')
     company_token = login_data.get('token')
     login_credentials = [full_username, password, company_token]
 
     if not (is_all_type(login_credentials, str) or is_valid_string(login_credentials)):
-        return send_error(400, 'Invalid credentials',
-                          'You tried to login with invalid credentials')
+        return send_response(400, 'You tried to login with invalid credentials')
     try:
         all_at_pos = find_occurrences('@', full_username)
         company_id = 0
@@ -38,22 +36,18 @@ def login_route():
                 user.company.verify_auth_token(company_token) != company_id:
             raise Exception('We could not verify the user\'s credentials')
         login_user(user)
-        response = jsonify({'message': 'Logged in', 'status': 200 })
-        response.status_code = 200
-        return response
+        return send_response(200, 'Logged in')
     except Exception as e:
         log_activity('LOGIN[login_route]', by_=full_username, for_=full_username,
                      why_=str(e))
-        return send_error(400, 'Invalid credentials',
-                          'You tried to login with a badly formed credential')
+        return send_response(400, 'You tried to login with a badly formed credential')
 
 
 @login_api.route('/logout')
 @login_required
-@json
 def logout_route():
     logout_user()
-    return {}
+    return send_response(204, '')
 
 
 @login_api.route('/endpoints', methods=['GET'])
@@ -90,6 +84,5 @@ def get_all_endpoints():
 
 
 @login_api.route('/ping', methods=['GET'])
-@json
 def echo_ping():
-    return {'status': 'OK'}, 200, {}
+    return send_response(200, 'OK')
