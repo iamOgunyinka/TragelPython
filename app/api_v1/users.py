@@ -54,27 +54,26 @@ def reset_password():
     json_data = request.get_json()
     if json_data is None:
         return send_response(400, 'This request contains invalid or no data')
-    old_password = json_data.get('old_password')
     new_password = json_data.get('new_password')
     username = json_data.get('username')
-    user = db.session.query(User).filter_by(username=username).first()
-    if user is None or user.verify_password(old_password) is False:
+    user = db.session.query(User).filter_by(username=username, company_id=current_user.company_id).first()
+    if user is None:
         return send_response(404, 'The user with the information provided does '
                                   'not exist')
-    if user.company_id != current_user.company_id:
-        return send_response(403, 'You\'re not allowed to reset this user\'s '
-                                  'password')
+    if user == current_user:
+        return send_response(403, 'You\'re not allowed to reset your own password\'s '
+                                  'while logged in')
     log_activity(event_type='PASSWORD RESET[reset_password]',
                  by_=current_user.username, for_=username, why_='')
     user.password = new_password
-    db.session.add(user)
     try:
+        db.session.add(user)
         db.session.commit()
     except Exception as e:
         log_activity('PASSWORD RESET[Exception]', current_user.username,
                      user.username, str(e))
         return send_response(403, 'Forbidden', 'Invalid operation')
-    return jsonify({'Login': https_url_for('login_api.login_route')})
+    return send_response(200, 'Change successful')
 
 
 @v1_api.route('/delete_user', methods=['DELETE'])
@@ -105,18 +104,21 @@ def delete_user():
     return response
 
 
-@v1_api.route('/change_role/<int:user_id>', methods=['PUT'])
+@v1_api.route('/change_role/', methods=['PUT'])
 @admin_required
-def change_user_role(user_id):
+def change_user_role():
     json_data = request.get_json()
     if json_data is None:
         return send_response(400, 'This request contains invalid or no data')
+    user_data = base64.b64decode(request.args.get('payload')).decode()
+    user_id, role = user_data.split(':')
     user = User.query.get(user_id)
+    print('{} {}\n'.format(user_id, role))
     if not user or user.company_id != current_user.company_id:
         return send_response(404, 'The user with the information provided does '
                                   'not exist')
     try:
-        user.role = int(json_data.get('role', BASIC_USER))
+        user.role = int(role) if role is not None else BASIC_USER
         db.session.add(user)
         db.session.commit()
     except Exception as e:

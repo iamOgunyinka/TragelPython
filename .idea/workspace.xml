@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b79773e2-35db-4214-a6ce-5b9b8a60fa0a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/company.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/company.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/orders.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/orders.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/products.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/products.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/subscription.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/subscription.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/uploads.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/uploads.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/users.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/decorators/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/administrator_required.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/decorators/administrator_required.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/json.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/paginate.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/decorators/paginate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/subscribed.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/decorators/subscribed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/login_blueprint/validation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/login_blueprint/validation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils.py" afterDir="false" />
-    </list>
+    <list default="true" id="b79773e2-35db-4214-a6ce-5b9b8a60fa0a" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,11 +9,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/api_v1/orders.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="273">
+            <state relative-caret-position="105">
               <caret line="15" column="3" selection-start-line="15" selection-start-column="3" selection-end-line="15" selection-end-column="3" />
               <folding>
                 <element signature="e#0#29#0" expanded="true" />
@@ -41,8 +25,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="492">
-              <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
+            <state relative-caret-position="798">
+              <caret line="45" selection-start-line="45" selection-end-line="45" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -53,8 +37,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/login_blueprint/validation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="453">
-              <caret line="88" lean-forward="true" selection-start-line="88" selection-end-line="88" />
+            <state relative-caret-position="602">
+              <caret line="80" column="26" lean-forward="true" selection-start-line="80" selection-start-column="26" selection-end-line="80" selection-end-column="26" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
               </folding>
@@ -584,16 +568,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/api_v1/orders.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="15" column="3" selection-start-line="15" selection-start-column="3" selection-end-line="15" selection-end-column="3" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/auth.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="84">
@@ -614,10 +588,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/api_v1/orders.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="15" column="3" selection-start-line="15" selection-start-column="3" selection-end-line="15" selection-end-column="3" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="492">
-          <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
+        <state relative-caret-position="798">
+          <caret line="45" selection-start-line="45" selection-end-line="45" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -626,8 +610,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/login_blueprint/validation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="453">
-          <caret line="88" lean-forward="true" selection-start-line="88" selection-end-line="88" />
+        <state relative-caret-position="602">
+          <caret line="80" column="26" lean-forward="true" selection-start-line="80" selection-start-column="26" selection-end-line="80" selection-end-column="26" />
           <folding>
             <element signature="e#0#34#0" expanded="true" />
           </folding>
