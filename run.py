@@ -15,7 +15,7 @@ if __name__ == '__main__':
             company = Company(name='Tragel Group')
             super_user = User(fullname='Joshua', username='iamOgunyinka',
                               personal_email='ogunyinkajoshua@yahoo.com',
-                              password='password',role=SUPER_USER, )
+                              password='password', role=SUPER_USER, )
             company.staffs.append(super_user)
             db.session.add(company)
             db.session.add(super_user)

@@ -60,6 +60,12 @@ db.sqlite3
 instance/
 .webassets-cache
 
+# Database migrations
+migrations/
+
+# Locally uploaded images
+uploads/
+
 # Scrapy stuff:
 .scrapy
 

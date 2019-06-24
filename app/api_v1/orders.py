@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import request
+from flask import request, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import Date, cast
 
@@ -28,8 +28,8 @@ def get_orders():
 @api.route('/orders/<int:order_id>', methods=['GET'])
 @admin_required
 def get_customer_orders(order_id):
-    order = db.session.query(Order).filter_by(company_id=current_user.company_id,
-                                             id=order_id).first()
+    order = Order.query.filter_by(company_id=current_user.company_id,
+                                  id=order_id).first()
     if not order:
         return send_response(404, 'Order not found')
     return jsonify(order.to_json())
@@ -64,11 +64,13 @@ def new_customer_order():
 def delete_order():
     order_id = request.args.get('order_id', 0)
     reason = request.args.get('reason', '')
-    order = db.session.query(Order).filter_by(company_id=current_user.company_id,
-                                              id=order_id).first()
+    order = Order.query.filter_by(company_id=current_user.company_id,
+                                  id=order_id).first()
     if order is not None:
-        db.session.delete(order)
+        order.deleted = True
         db.session.commit()
+        log_activity('DELETION[orders]', current_user.username,
+                     current_user.company_id, reason)
         return send_response(200, 'Successful')
     return send_response(404, 'There was an error processing the data sent in '
                               'your request')

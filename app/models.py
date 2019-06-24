@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import current_app
 from flask_login import UserMixin, AnonymousUserMixin, LoginManager
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, BaseQuery
 from itsdangerous import JSONWebSignatureSerializer as JSONSerializer, \
     base64_decode, base64_encode
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -55,6 +55,33 @@ class Company(db.Model):
             return None
 
 
+class SoftDeletedQuery(BaseQuery):
+    _with_deleted = False
+
+    def __new__(cls, *args, **kwargs):
+        obj = super(SoftDeletedQuery, cls).__new__(cls)
+        obj._with_deleted = kwargs.pop('_with_deleted', False)
+        if len(args) > 0:
+            super(SoftDeletedQuery, obj).__init__(*args, **kwargs)
+            return obj.filter_by(deleted=False) if not obj._with_deleted else obj
+        return obj
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def with_deleted(self):
+        return self.__class__(db.class_mapper(self._mapper_zero().class_),
+                              session=db.session(), _with_deleted=True)
+
+    def _get(self, *args, **kwargs):
+        return super(SoftDeletedQuery, self).get(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        obj = self.with_deleted()._get(*args, **kwargs)
+        return obj if obj is None or self._with_deleted or not obj.deleted \
+            else None
+
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -65,6 +92,9 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128), nullable=False, index=True)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     role = db.Column(db.SmallInteger, nullable=False)
+    deleted = db.Column(db.Boolean(), default=False, nullable=False)
+
+    query_class = SoftDeletedQuery
 
     def __repr__(self):
         return '<User {}, {}, {}>'.format(self.fullname, self.username, self.company)
@@ -98,30 +128,38 @@ class Anonymous(AnonymousUserMixin):
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, nullable=False, unique=True)
+    name = db.Column(db.String(64), index=True, nullable=False, unique=False)
     price = db.Column(db.Float, nullable=False, unique=False)
     thumbnail = db.Column(db.String(128), nullable=True, unique=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
+    deleted = db.Column(db.Boolean(), default=False, nullable=False)
+
+    query_class = SoftDeletedQuery
 
     @staticmethod
     def from_json(json_data, company_id):
         items = []
         if json_data is None: return json_data
         for json_object in json_data:
-            product_name = json_object.get('name')
-            product_price = json_object.get('price')
+            product_name = json_object.get('name', '')
+            product_price = json_object.get('price', 0.0)
             thumbnail_url = json_object.get('thumbnail', '')
+            new_product = Product(name=product_name, price=product_price,
+                                  company_id=company_id, thumbnail=thumbnail_url)
             product_id = int(json_object.get('id', 0))
-            product = Product.query.get(product_id)
-            if product is None:
-                product = Product()
-            product.name = product_name
-            product.price = float(product_price)
-            if len(thumbnail_url) != 0:
-                product.thumbnail = thumbnail_url
-            product.company_id = company_id
-            items.append(product)
+            existing_product = Product.query.get(product_id)
+            if existing_product is not None:
+                if not existing_product == new_product:
+                    existing_product.deleted = True
+                    items.append(existing_product)
+                    items.append(new_product)
+            else:
+                items.append(new_product)
         return items
+
+    def __eq__(self, other):
+        return self.name == other.name and self.price == other.price and\
+            self.thumbnail == other.thumbnail
 
     def to_json(self):
         return {
@@ -144,7 +182,7 @@ class Item(db.Model):
     quantity = db.Column(db.Integer, default=lambda: 1)
 
     def to_json(self):
-        product = Product.query.get(self.product_id)
+        product = Product.query.with_deleted().get(self.product_id)
         return {
             'product': product.name, 'quantity': self.quantity,
             'price': product.price
@@ -160,6 +198,9 @@ class Order(db.Model):
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     items = db.relationship('Item', backref='order', lazy='dynamic',
                             cascade='all, delete-orphan')
+    deleted = db.Column(db.Boolean(), default=False, nullable=False)
+
+    query_class = SoftDeletedQuery
 
     @staticmethod
     def import_data(order_data):

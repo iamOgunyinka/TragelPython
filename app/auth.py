@@ -1,7 +1,8 @@
-from flask import jsonify, g
+from flask import g
 from flask_httpauth import HTTPBasicAuth
-from .utils import SUPER_USER
+
 from .models import User
+from .utils import SUPER_USER, send_response
 
 su_auth = HTTPBasicAuth()
 
@@ -16,7 +17,4 @@ def verify_password(username, password):
 
 @su_auth.error_handler
 def unauthorized_token():
-    response = jsonify({'status': 401, 'error': 'Unauthorized',
-                        'message': 'Please send a valid authentication data'})
-    response.status_code = 401
-    return response
+    return send_response(401, 'Please send a valid authentication data')

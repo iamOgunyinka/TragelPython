@@ -4,8 +4,8 @@ from flask_login import login_user, logout_user, login_required
 from ..auth import su_auth
 from ..login_blueprint import login_api
 from ..models import User, Company
-from ..utils import is_all_type, is_valid_string, find_occurrences, \
-    https_url_for, send_response, log_activity
+from ..utils import is_all_type, is_valid_string, https_url_for, \
+    send_response, log_activity
 
 
 @login_api.route('/login', methods=['POST'])
@@ -13,34 +13,22 @@ def login_route():
     login_data = request.get_json()
     if login_data is None:
         return send_response(400, 'Invalid data sent for login')
-    full_username = login_data.get('username')
+    username = login_data.get('username')
     password = login_data.get('password')
     company_token = login_data.get('token')
-    login_credentials = [full_username, password, company_token]
+    login_credentials = [username, password, company_token]
 
     if not (is_all_type(login_credentials, str) or is_valid_string(login_credentials)):
-        return send_response(400, 'You tried to login with invalid credentials')
+        return send_response(401, 'You tried to login with invalid credentials')
     try:
-        all_at_pos = find_occurrences('@', full_username)
-        company_id = 0
-        if len(all_at_pos) > 2:
-            username = all_at_pos[0] + '@' + all_at_pos[1]
-            company_id = int(all_at_pos[2])
-        elif len(all_at_pos) == 2:
-            username = all_at_pos[0]
-            company_id = int(all_at_pos[1])
-        else:
-            username = full_username
         user = User.query.filter_by(username=username).first()
-        if user is None or user.verify_password(password) is False or \
-                user.company.verify_auth_token(company_token) != company_id:
+        if user is None or user.verify_password(password) is False:
             raise Exception('We could not verify the user\'s credentials')
         login_user(user)
-        return send_response(200, 'Logged in')
     except Exception as e:
-        log_activity('LOGIN[login_route]', by_=full_username, for_=full_username,
-                     why_=str(e))
-        return send_response(400, 'You tried to login with a badly formed credential')
+        log_activity('LOGIN[login_route]', by_=username, for_=username, why_=str(e))
+        return send_response(402, 'You tried to login with a badly formed credential')
+    return send_response(200, 'Logged in')
 
 
 @login_api.route('/logout')
@@ -53,7 +41,7 @@ def logout_route():
 @login_api.route('/endpoints', methods=['GET'])
 @su_auth.login_required
 def get_all_endpoints():
-    company_id = request.args.get('company_id')
+    company_id = request.args.get('company_id', 0, type=int)
     company = Company.query.get(company_id)
     company_token = '' if company is None else company.generate_auth_token()
     response = jsonify({'login': https_url_for('login.login_route'),
@@ -67,8 +55,7 @@ def get_all_endpoints():
                         'add_subscription': https_url_for('api.add_subscription'),
                         'get_products': https_url_for('api.get_products'),
                         'get_product': https_url_for('api.get_product', product_id=0),
-                        'update_product': https_url_for('api.edit_product',
-                                                        product_id=0),
+                        'remove_product': https_url_for('api.delete_product'),
                         'add_product': https_url_for('api.new_product'),
                         'get_orders': https_url_for('api.get_orders'),
                         'get_customer_order': https_url_for('api.get_customer_orders',

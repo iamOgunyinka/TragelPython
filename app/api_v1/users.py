@@ -7,7 +7,7 @@ from . import v1_api
 from ..decorators import paginate
 from ..models import db, User
 from ..utils import is_all_type, BASIC_USER, SUPER_USER, find_occurrences, \
-    https_url_for, log_activity, send_response, admin_required
+    log_activity, send_response, admin_required
 
 
 @v1_api.route('/create_user', methods=['POST'])
@@ -95,7 +95,7 @@ def delete_user():
     if user is None:
         return send_response(404, 'The user with the information provided does '
                                   'not exist')
-    db.session.delete(user)
+    user.deleted = True
     db.session.commit()
     log_activity(event_type='DELETE[delete_user]', by_=current_user.username,
                  for_=username, why_=reason)
@@ -107,13 +107,9 @@ def delete_user():
 @v1_api.route('/change_role/', methods=['PUT'])
 @admin_required
 def change_user_role():
-    json_data = request.get_json()
-    if json_data is None:
-        return send_response(400, 'This request contains invalid or no data')
     user_data = base64.b64decode(request.args.get('payload')).decode()
     user_id, role = user_data.split(':')
-    user = User.query.get(user_id)
-    print('{} {}\n'.format(user_id, role))
+    user = User.query.get(int(user_id))
     if not user or user.company_id != current_user.company_id:
         return send_response(404, 'The user with the information provided does '
                                   'not exist')
@@ -132,5 +128,5 @@ def change_user_role():
 @paginate("users", 100)
 def list_users():
     if current_user.role != SUPER_USER:
-        return User.query.filter_by(company_id=current_user.company_id)
-    return User.query.filter_by(company_id=current_user.company_id, role=BASIC_USER)
+        return User.query.filter_by(company_id=current_user.company_id, role=BASIC_USER)
+    return User.query.filter_by(company_id=current_user.company_id)
