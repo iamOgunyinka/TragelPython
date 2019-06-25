@@ -6,7 +6,7 @@ from flask_login import current_user
 from . import v1_api as api
 from ..decorators import paginate
 from ..models import Subscription, db, Company
-from ..utils import admin_required, send_response, permission_required, SUPER_USER
+from ..utils import admin_required, send_response, sudo_required
 from ..utils import date_from_string
 
 
@@ -40,7 +40,7 @@ def add_subscription():
 
 
 @api.route('/create_subscription', methods=['POST'])
-@permission_required(SUPER_USER)
+@sudo_required
 def create_subscription():
     company_id = request.json.get('company_id')
     company = db.session.query(Company).filter_by(id=company_id).first()

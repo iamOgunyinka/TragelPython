@@ -1,5 +1,6 @@
 import logging
 import os
+import uuid
 from datetime import date
 from functools import partial
 
@@ -11,13 +12,37 @@ from .decorators import permission_required
 log_cfg = os.path.join(os.getcwd(), 'logs', 'all_logs.txt')
 logging.basicConfig(filename=log_cfg, filemode='a+',
                     format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-
-(SUPER_USER, ADMINISTRATOR, BASIC_USER) = (0x4C, 0x4B, 0x4A)
 https_url_for = partial(http_url_for, _scheme='https', _external=True)
 
 
+class UserType:
+    BasicUser = 0x4A
+    Administrator = 0x4B
+    SuperUser = 0x4C
+
+
+class SearchType:
+    BY_PAYMENT_REF = 0
+    BY_CASH_PAYMENT = 1
+    BY_COMPANY_USER = 2
+    BY_PUBLIC_USER = 3
+
+
+class PaymentType:
+    Cash = 0
+    EBanking = 1
+
+
+def generate_payment_id():
+    return uuid.uuid4().hex
+
+
 def admin_required(function):
-    return permission_required(ADMINISTRATOR)(function)
+    return permission_required(UserType.Administrator)(function)
+
+
+def sudo_required(function):
+    return permission_required(UserType.SuperUser)(function)
 
 
 def date_from_string(text, default_date):

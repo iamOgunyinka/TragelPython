@@ -1,9 +1,12 @@
 import functools
 
 from flask import url_for, request, jsonify
+from functools import partial
+
+url_for = partial(url_for, _scheme='https', _external=True)
 
 
-def paginate(collection, max_per_page=25):
+def paginate(collection, max_per_page=10):
     """Generate a paginated response for a resource collection.
 
     Routes that use this decorator must return a SQLAlchemy query as a

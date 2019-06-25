@@ -2,7 +2,7 @@ from flask import g
 from flask_httpauth import HTTPBasicAuth
 
 from .models import User
-from .utils import SUPER_USER, send_response
+from .utils import UserType, send_response
 
 su_auth = HTTPBasicAuth()
 
@@ -10,7 +10,7 @@ su_auth = HTTPBasicAuth()
 @su_auth.verify_password
 def verify_password(username, password):
     g.user = User.query.filter_by(username=username).first()
-    if g.user is None or g.user.role != SUPER_USER:
+    if g.user is None or g.user.role != UserType.SuperUser:
         return False
     return g.user.verify_password(password)
 

@@ -5,24 +5,24 @@ from . import v1_api as api
 from .. import db
 from ..decorators import paginate, permission_required
 from ..models import Company
-from ..utils import send_response, log_activity, SUPER_USER
+from ..utils import send_response, log_activity, sudo_required
 
 
 @api.route('/companies/', methods=['GET'])
-@permission_required(SUPER_USER)
+@sudo_required
 @paginate('companies')
 def get_companies():
     return Company.query.order_by(Company.id)
 
 
 @api.route('/companies/<int:company_id>', methods=['GET'])
-@permission_required(SUPER_USER)
+@sudo_required
 def get_company(company_id):
     return Company.query.get_or_404(company_id)
 
 
 @api.route('/companies', methods=['POST'])
-@permission_required(SUPER_USER)
+@sudo_required
 def create_new_company():
     company = Company.import_json(request.json)
     if company is None:
@@ -34,7 +34,7 @@ def create_new_company():
 
 
 @api.route('/companies/<int:company_id>', methods=['DELETE'])
-@permission_required(SUPER_USER)
+@sudo_required
 def delete_company(company_id):
     company = Company.query.get(company_id)
     if not company:

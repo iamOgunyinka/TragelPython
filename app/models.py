@@ -7,7 +7,7 @@ from itsdangerous import JSONWebSignatureSerializer as JSONSerializer, \
     base64_decode, base64_encode
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .utils import log_activity, https_url_for
+from .utils import log_activity, https_url_for, PaymentType, generate_payment_id
 
 login_manager = LoginManager()
 db = SQLAlchemy()
@@ -194,10 +194,14 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     staff_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     date_of_order = db.Column(db.DateTime, default=datetime.now)
+    payment_type = db.Column(db.Integer, unique=False, nullable=False,
+                             default=PaymentType.EBanking)
     payment_reference = db.Column(db.Text, unique=True, index=False, nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     items = db.relationship('Item', backref='order', lazy='dynamic',
                             cascade='all, delete-orphan')
+    payment_confirmed = db.relationship('Confirmation', backref='order',
+                                        uselist=False)
     deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
     query_class = SoftDeletedQuery
@@ -205,23 +209,46 @@ class Order(db.Model):
     @staticmethod
     def import_data(order_data):
         try:
-            payment_reference_id = order_data.get('payment_reference_id')
+            payment_ref_id = order_data.get('payment_reference_id')
+            paid_in_cash = payment_ref_id == 'cash'
+            if paid_in_cash:
+                payment_ref_id = generate_payment_id()
             order_list = []
             for item in order_data.get('items'):
                 new_item = Item(quantity=item.get('quantity'),
                                 product_id=item.get('product_id'))
                 order_list.append(new_item)
-            return payment_reference_id, order_list
+            pay_type = PaymentType.Cash if paid_in_cash else PaymentType.EBanking
+            return payment_ref_id, pay_type, order_list
         except:
-            return None, None
+            return None
 
     def to_json(self):
         return {
             'id': self.id, 'staff': User.query.get(self.staff_id).fullname,
+            'payment_type': self.payment_type,
             'payment_reference': self.payment_reference,
             'date': self.date_of_order.isoformat(),
-            'items': [item.to_json() for item in self.items]
+            'items': [item.to_json() for item in self.items],
+            'confirmation': self.payment_confirmed.to_json()
         }
+
+
+class Confirmation(db.Model):
+    __tablename__ = 'confirmations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    confirmed = db.Column(db.Boolean(), default=False, nullable=False)
+    admin_id = db.Column(db.Integer, unique=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), unique=True)
+    date = db.Column(db.DateTime, unique=False)
+
+    def to_json(self):
+        result = {'confirmed': self.confirmed}
+        if self.confirmed == 1:
+            result['by'] = User.query.with_deleted().get(self.admin_id).fullname
+            result['date'] = self.date.isoformat()
+        return result
 
 
 class Subscription(db.Model):

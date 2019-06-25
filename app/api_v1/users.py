@@ -6,7 +6,7 @@ from flask_login import current_user
 from . import v1_api
 from ..decorators import paginate
 from ..models import db, User
-from ..utils import is_all_type, BASIC_USER, SUPER_USER, find_occurrences, \
+from ..utils import is_all_type, UserType, find_occurrences, \
     log_activity, send_response, admin_required
 
 
@@ -21,9 +21,10 @@ def create_user():
     fullname = json_data.get('name')
     personal_email = json_data.get('email')
     personal_address = json_data.get('address')
-    role = json_data.get('type', BASIC_USER)
+    role = json_data.get('type', UserType.BasicUser)
     if is_all_type([base64_username_password, personal_email], str) is False or\
-            type(role) != int or (role < BASIC_USER or role >= SUPER_USER):
+            type(role) != int or (role < UserType.BasicUser or
+                                  role >= UserType.SuperUser):
         return send_response(402, 'This request\'s data is in an unrecognized format')
     try:
         raw_data = base64.b64decode(base64_username_password).decode()
@@ -104,7 +105,7 @@ def delete_user():
     return response
 
 
-@v1_api.route('/change_role/', methods=['PUT'])
+@v1_api.route('/change_role/', methods=['GET'])
 @admin_required
 def change_user_role():
     user_data = base64.b64decode(request.args.get('payload')).decode()
@@ -114,7 +115,7 @@ def change_user_role():
         return send_response(404, 'The user with the information provided does '
                                   'not exist')
     try:
-        user.role = int(role) if role is not None else BASIC_USER
+        user.role = int(role) if role is not None else UserType.BasicUser
         db.session.add(user)
         db.session.commit()
     except Exception as e:
@@ -127,6 +128,7 @@ def change_user_role():
 @admin_required
 @paginate("users", 100)
 def list_users():
-    if current_user.role != SUPER_USER:
-        return User.query.filter_by(company_id=current_user.company_id, role=BASIC_USER)
+    if current_user.role != UserType.SuperUser:
+        return User.query.filter_by(company_id=current_user.company_id,
+                                    role=UserType.BasicUser)
     return User.query.filter_by(company_id=current_user.company_id)

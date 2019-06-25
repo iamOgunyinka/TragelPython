@@ -58,6 +58,7 @@ def get_all_endpoints():
                         'remove_product': https_url_for('api.delete_product'),
                         'add_product': https_url_for('api.new_product'),
                         'get_orders': https_url_for('api.get_orders'),
+                        'confirm_order': https_url_for('api.confirm_customer_order'),
                         'get_customer_order': https_url_for('api.get_customer_orders',
                                                             order_id=0),
                         'add_order': https_url_for('api.new_customer_order'),

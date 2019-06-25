@@ -3,7 +3,7 @@ import os
 
 from app import create_app, db
 from app.models import User, Company
-from app.utils import SUPER_USER
+from app.utils import UserType
 
 app = create_app(os.environ.get('FLASK_CONFIG', 'development'))
 
@@ -15,7 +15,7 @@ if __name__ == '__main__':
             company = Company(name='Tragel Group')
             super_user = User(fullname='Joshua', username='iamOgunyinka',
                               personal_email='ogunyinkajoshua@yahoo.com',
-                              password='password', role=SUPER_USER, )
+                              password='password', role=UserType.SuperUser )
             company.staffs.append(super_user)
             db.session.add(company)
             db.session.add(super_user)

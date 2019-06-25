@@ -1,6 +1,7 @@
 from flask import Blueprint
 from flask_uploads import IMAGES, UploadSet
 from ..decorators import etag, rate_limit
+from ..utils import send_response
 
 v1_api = Blueprint('api', __name__)
 images = UploadSet('photos', IMAGES)
@@ -11,6 +12,11 @@ images = UploadSet('photos', IMAGES)
 def before_request():
     """All routes in this blueprint require authentication."""
     pass
+
+
+@v1_api.app_errorhandler(404)
+def app_err_handler(e):
+    return send_response(404, str(e))
 
 
 @v1_api.after_request
