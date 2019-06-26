@@ -102,7 +102,7 @@ class User(db.Model, UserMixin):
     def to_json(self):
         return {
             'id': self.id, 'name': self.fullname, 'username': self.username,
-            'role': self.role
+            'role': self.role, 'email': self.personal_email
         }
 
     @property

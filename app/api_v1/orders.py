@@ -88,6 +88,13 @@ def confirm_customer_order():
     return send_response(200, order.payment_confirmed.to_json() )
 
 
+@api.route('/orders/count', methods=['GET'])
+@admin_required
+def order_count():
+    count = Order.query.filter_by(company_id=current_user.company_id).count()
+    return send_response(200, {'count': count})
+
+
 @api.route('/orders/', methods=['POST'])
 @login_required
 def new_customer_order():

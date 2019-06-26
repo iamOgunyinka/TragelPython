@@ -21,4 +21,4 @@ if __name__ == '__main__':
             db.session.add(super_user)
             db.session.commit()
         # create a development user
-    app.run()
+    app.run(debug=True, port=6000)

@@ -111,6 +111,7 @@ def change_user_role():
     user_data = base64.b64decode(request.args.get('payload')).decode()
     user_id, role = user_data.split(':')
     user = User.query.get(int(user_id))
+    print('{}, {}, {}'.format(user_id, role, user))
     if not user or user.company_id != current_user.company_id:
         return send_response(404, 'The user with the information provided does '
                                   'not exist')
@@ -121,14 +122,11 @@ def change_user_role():
     except Exception as e:
         log_activity('SERVER ERROR[change_user_role]', by_='', for_='', why_=str(e))
         return send_response(400, 'The data is malformed')
-    return send_response(200, 'Successful')
+    return send_response(200, {'role': user.role})
 
 
 @v1_api.route('/list_users', methods=['GET'])
 @admin_required
 @paginate("users", 100)
 def list_users():
-    if current_user.role != UserType.SuperUser:
-        return User.query.filter_by(company_id=current_user.company_id,
-                                    role=UserType.BasicUser)
-    return User.query.filter_by(company_id=current_user.company_id)
+    return User.query.filter(User.company_id==current_user.company_id, User.id!=current_user.id)
