@@ -14,8 +14,7 @@ from ..utils import date_from_string
 @admin_required
 @paginate('subscriptions')
 def get_subscriptions():
-    return db.session.query(Subscription) \
-        .filter_by(company_id=current_user.company_id).all()
+    return Subscription.query.filter_by(company_id=current_user.company_id).all()
 
 
 @api.route('/subscribe/', methods=['POST'])

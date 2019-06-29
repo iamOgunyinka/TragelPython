@@ -224,14 +224,16 @@ class Order(db.Model):
             return None
 
     def to_json(self):
-        return {
+        result = {
             'id': self.id, 'staff': User.query.get(self.staff_id).fullname,
             'payment_type': self.payment_type,
             'payment_reference': self.payment_reference,
             'date': self.date_of_order.isoformat(),
             'items': [item.to_json() for item in self.items],
-            'confirmation': self.payment_confirmed.to_json()
         }
+        if self.payment_confirmed is not None:
+            result['confirmation'] = self.payment_confirmed.to_json()
+        return result
 
 
 class Confirmation(db.Model):
