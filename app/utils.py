@@ -88,7 +88,6 @@ def log_activity(event_type, by_, for_, why_, **kwargs):
 
 
 def upload(upload_object, request_object, company_id, data) -> dict:
-    print(request_object.files)
     if data in request_object.files:
         try:
             filename = upload_object.save(request_object.files[data],
