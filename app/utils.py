@@ -7,18 +7,10 @@ from functools import partial
 from flask import url_for as http_url_for, jsonify
 from flask_uploads import UploadNotAllowed
 
-from .decorators import permission_required
-
 log_cfg = os.path.join(os.getcwd(), 'logs', 'all_logs.txt')
 logging.basicConfig(filename=log_cfg, filemode='a+',
                     format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 https_url_for = partial(http_url_for, _scheme='https', _external=True)
-
-
-class UserType:
-    BasicUser = 0x4A
-    Administrator = 0x4B
-    SuperUser = 0x4C
 
 
 class SearchType:
@@ -35,14 +27,6 @@ class PaymentType:
 
 def generate_payment_id():
     return uuid.uuid4().hex
-
-
-def admin_required(function):
-    return permission_required(UserType.Administrator)(function)
-
-
-def sudo_required(function):
-    return permission_required(UserType.SuperUser)(function)
 
 
 def date_from_string(text, default_date):

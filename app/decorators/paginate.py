@@ -6,7 +6,7 @@ from functools import partial
 url_for = partial(url_for, _scheme='https', _external=True)
 
 
-def paginate(collection, max_per_page=10):
+def paginate(collection, max_per_page=50):
     """Generate a paginated response for a resource collection.
 
     Routes that use this decorator must return a SQLAlchemy query as a

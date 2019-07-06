@@ -2,11 +2,12 @@ from flask import request, jsonify
 from flask_login import current_user
 
 from . import v1_api as api, images as photo_object
-from ..utils import admin_required, upload as upload_image, send_response
+from ..decorators import UserType, permission_required
+from ..utils import upload as upload_image, send_response
 
 
 @api.route('/upload_image', methods=['POST'])
-@admin_required
+@permission_required(UserType.Administrator)
 def upload_image_route():
     result = upload_image(photo_object, request, current_user.company_id, 'photo')
     url = result.get('url')

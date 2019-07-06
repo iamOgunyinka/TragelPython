@@ -1,19 +1,20 @@
+import base64
 from datetime import datetime
 
 from flask import request, jsonify, abort
 from flask_login import login_required, current_user
 from sqlalchemy import Date, cast
-import base64
+
 from . import v1_api as api
 from .. import db
-from ..decorators import paginate
+from ..decorators import paginate, permission_required, UserType
 from ..models import Order, User, Confirmation
-from ..utils import admin_required, send_response, log_activity, \
+from ..utils import send_response, log_activity, \
     date_from_string, SearchType, PaymentType
 
 
 @api.route('/orders/', methods=['GET'])
-@admin_required
+@permission_required(UserType.Administrator)
 @paginate('orders')
 def get_orders():
     date_from = date_from_string(request.args.get('from'), None)
@@ -58,7 +59,7 @@ def get_orders():
 
 
 @api.route('/orders/<int:order_id>', methods=['GET'])
-@admin_required
+@permission_required(UserType.Administrator)
 def get_customer_orders(order_id):
     order = Order.query.filter_by(company_id=current_user.company_id,
                                   id=order_id).first()
@@ -68,7 +69,7 @@ def get_customer_orders(order_id):
 
 
 @api.route('/orders/confirm', methods=['GET'])
-@admin_required
+@permission_required(UserType.Administrator)
 def confirm_customer_order():
     details = base64.b64decode(request.args.get('payload')).decode()
     order_id, confirmation_date = details.split('@')
@@ -89,7 +90,7 @@ def confirm_customer_order():
 
 
 @api.route('/orders/count', methods=['GET'])
-@admin_required
+@permission_required(UserType.Administrator)
 def order_count():
     count = Order.query.filter_by(company_id=current_user.company_id).count()
     return send_response(200, {'count': count})
@@ -121,7 +122,7 @@ def new_customer_order():
 
 
 @api.route('/orders/', methods=['DELETE'])
-@admin_required
+@permission_required(UserType.Administrator)
 def delete_order():
     order_id = request.args.get('order_id', 0)
     reason = request.args.get('reason', '')

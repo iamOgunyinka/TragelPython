@@ -4,14 +4,13 @@ from flask import request, jsonify
 from flask_login import current_user
 
 from . import v1_api
-from ..decorators import paginate
+from ..decorators import paginate, UserType, permission_required
 from ..models import db, User
-from ..utils import is_all_type, UserType, find_occurrences, \
-    log_activity, send_response, admin_required
+from ..utils import is_all_type, find_occurrences, log_activity, send_response
 
 
 @v1_api.route('/create_user', methods=['POST'])
-@admin_required
+@permission_required(UserType.Administrator)
 def create_user():
     json_data = request.get_json()
     if json_data is None:
@@ -50,7 +49,7 @@ def create_user():
 
 
 @v1_api.route('/reset_password', methods=['POST'])
-@admin_required
+@permission_required(UserType.Administrator)
 def reset_password():
     json_data = request.get_json()
     if json_data is None:
@@ -78,7 +77,7 @@ def reset_password():
 
 
 @v1_api.route('/delete_user', methods=['DELETE'])
-@admin_required
+@permission_required(UserType.Administrator)
 def delete_user():
     payload = base64.b64decode(request.args.get('payload')).decode()
     payload = payload.split(':')
@@ -106,7 +105,7 @@ def delete_user():
 
 
 @v1_api.route('/change_role/', methods=['GET'])
-@admin_required
+@permission_required(UserType.Administrator)
 def change_user_role():
     user_data = base64.b64decode(request.args.get('payload')).decode()
     user_id, role = user_data.split(':')
@@ -126,7 +125,7 @@ def change_user_role():
 
 
 @v1_api.route('/list_users', methods=['GET'])
-@admin_required
-@paginate("users", 100)
+@permission_required(UserType.Administrator)
+@paginate("users")
 def list_users():
     return User.query.filter(User.company_id==current_user.company_id, User.id!=current_user.id)

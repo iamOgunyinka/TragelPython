@@ -1,8 +1,9 @@
 from flask import g
 from flask_httpauth import HTTPBasicAuth
 
+from .decorators import UserType
 from .models import User
-from .utils import UserType, send_response
+from .utils import send_response
 
 su_auth = HTTPBasicAuth()
 

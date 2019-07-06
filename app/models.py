@@ -20,6 +20,9 @@ class Company(db.Model):
     __tablename__ = 'companies'
     id = db.Column(db.Integer, primary_key=True, unique=True, index=True)
     name = db.Column(db.String(128), index=True, nullable=False)
+    official_email = db.Column(db.String(128), nullable=True)
+    address = db.Column(db.String(256), nullable=False)
+    city_id = db.Column(db.Integer, nullable=False)
     date_of_creation = db.Column(db.DateTime, nullable=False, default=datetime.now)
     staffs = db.relationship('User', backref='company')
     orders = db.relationship('Order', backref='company')
@@ -120,6 +123,10 @@ class User(db.Model, UserMixin):
 class Anonymous(AnonymousUserMixin):
     def verify_password(self):
         return False
+
+    @property
+    def role(self):
+        return 0
 
     def __repr__(self):
         return '<Anonymous>'
@@ -256,6 +263,7 @@ class Confirmation(db.Model):
 class Subscription(db.Model):
     __tablename__ = 'subscriptions'
     id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.Text, nullable=False)
     begin_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
@@ -280,8 +288,8 @@ class Subscription(db.Model):
     @staticmethod
     def generate_subscription_token(company_id, company_name, from_date, to_date):
         serializer = JSONSerializer(current_app.config['SECRET_KEY'])
-        obj = {'id': company_id, 'company': company_name, 'from': str(from_date),
-               'to': str(to_date)}
+        obj = {'id': company_id, 'company': company_name,
+               'from': from_date.isoformat(), 'to': to_date.isoformat() }
         return base64_encode(serializer.dumps(obj)).decode('utf-8')
 
     @staticmethod
@@ -290,8 +298,41 @@ class Subscription(db.Model):
         try:
             data_object = base64_decode(s.loads(token).decode('utf-8'))
         except:
-            return None, None, None
+            return None
         return data_object.get('id'), data_object.get('from'), data_object.get('to')
+
+
+class Country(db.Model):
+    __tablename__ = 'countries'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False, unique=True)
+    states = db.relationship('State', backref='country')
+
+    def to_json(self):
+        return {'name': self.name,
+                'states': [state.to_json() for state in self.states]}
+
+
+class State(db.Model):
+    __tablename__ = 'states'
+    id= db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False, unique=True)
+    cities = db.relationship('City', backref='state')
+    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
+
+    def to_json(self):
+        return {'name': self.name,
+                'cities': [city.to_json() for city in self.cities] }
+
+
+class City(db.Model):
+    __tablename__ = 'cities'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False, unique=False)
+    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
+
+    def to_json(self):
+        return self.name
 
 
 @login_manager.user_loader

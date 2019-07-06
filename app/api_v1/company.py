@@ -1,16 +1,16 @@
-from flask import request, jsonify
+from flask import request
 from flask_login import current_user
 
 from . import v1_api as api
 from .. import db
-from ..decorators import paginate, permission_required
+from ..decorators import paginate, sudo_required
 from ..models import Company
-from ..utils import send_response, log_activity, sudo_required
+from ..utils import send_response, log_activity
 
 
 @api.route('/companies/', methods=['GET'])
-@sudo_required
 @paginate('companies')
+@sudo_required
 def get_companies():
     return Company.query.order_by(Company.id)
 
@@ -26,7 +26,8 @@ def get_company(company_id):
 def create_new_company():
     company = Company.import_json(request.json)
     if company is None:
-        return send_response(404, 'Bad request', 'Unable to get the JSON data needed')
+        return send_response(404, 'Bad request',
+                             'Unable to get the JSON data needed')
     db.session.add(company)
     db.session.commit()
 
@@ -41,5 +42,6 @@ def delete_company(company_id):
         return send_response(404, 'Company not found', '')
     db.session.delete(company)
     db.session.commit()
-    log_activity('DELETE[delete_company]', current_user.username, company.name, '')
+    log_activity('DELETE[delete_company]', current_user.username,
+                 company.name, '')
     return send_response(200, 'Successful', 'OK')
