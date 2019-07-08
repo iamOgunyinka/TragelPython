@@ -90,7 +90,9 @@
                             </div>
                             <div class="content">
                                 You're not authorized to see this page,
-                                please login
+                                <a href="{{url_for('admin.login_route')}}">
+									click here to login
+                                </a>.
                             </div>
                         </div>
                     </div>
@@ -114,6 +116,7 @@
 
 
 </body>
+	<script></script>
 
     <!--   Core JS Files   -->
     <script src="{{ url_for( 'static', filename = 'js/jquery.3.2.1.min.js')}}"

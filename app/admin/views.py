@@ -98,7 +98,7 @@ def _get_products():
 @admin.route('/_staffs/', methods=['GET'])
 @sudo_required
 def _get_staffs():
-    company_id = request.args.get('staff_id', 1, type=int)
+    company_id = request.args.get('company_id', 1, type=int)
     staffs = [staff.to_json() for staff in User.query.with_deleted().filter_by(
         company_id=company_id).all()]
     return jsonify(staffs)
