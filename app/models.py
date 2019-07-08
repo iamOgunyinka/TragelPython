@@ -7,7 +7,9 @@ from itsdangerous import JSONWebSignatureSerializer as JSONSerializer, \
     base64_decode, base64_encode
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .utils import log_activity, https_url_for, PaymentType, generate_payment_id
+from .decorators import role_to_string
+from .utils import log_activity, https_url_for, PaymentType, \
+    generate_payment_id
 
 login_manager = LoginManager()
 db = SQLAlchemy()
@@ -36,6 +38,15 @@ class Company(db.Model):
     def generate_auth_token(self):
         s = JSONSerializer(current_app.config['SECRET_KEY'])
         return s.dumps({'id': self.id}).decode('utf-8')
+
+    def to_json(self):
+        city = City.query.filter_by(id=self.city_id).first()
+        country = city.state.country.name if city else ''
+        city = city.name if city else ''
+        return {'name': self.name, 'id': self.id, 'city': city,
+                'country': country, 'staffs': len(self.staffs),
+                'products': len(self.products),
+                'date': self.date_of_creation}
 
     @staticmethod
     def verify_auth_token(token):
@@ -105,7 +116,8 @@ class User(db.Model, UserMixin):
     def to_json(self):
         return {
             'id': self.id, 'name': self.fullname, 'username': self.username,
-            'role': self.role, 'email': self.personal_email
+            'role': self.role, 'email': self.personal_email,
+            'is_deleted': self.deleted, 'role_name': role_to_string(self.role)
         }
 
     @property
@@ -170,7 +182,7 @@ class Product(db.Model):
 
     def to_json(self):
         return {
-            'name': self.name, 'price': self.price,
+            'name': self.name, 'price': self.price, 'deleted': self.deleted,
             'thumbnail': self.thumbnail, 'id': self.id,
             'url': https_url_for('api.get_product', product_id=self.id),
         }

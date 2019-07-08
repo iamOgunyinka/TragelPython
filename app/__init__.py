@@ -5,6 +5,7 @@ from flask_bootstrap import Bootstrap
 from flask_migrate import Migrate
 from flask_uploads import configure_uploads, patch_request_class
 from flask_wtf.csrf import CSRFProtect
+from flask_moment import Moment
 
 from .decorators import no_cache, rate_limit
 from .models import db, login_manager
@@ -12,6 +13,7 @@ from .models import db, login_manager
 bootstrap = Bootstrap()
 csrf = CSRFProtect()
 migrate = Migrate()
+moment = Moment()
 
 
 def create_app(config_name):
@@ -29,6 +31,7 @@ def create_app(config_name):
     bootstrap.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
+    moment.init_app(app)
 
     # register blueprints
     from .api_v1 import v1_api as api

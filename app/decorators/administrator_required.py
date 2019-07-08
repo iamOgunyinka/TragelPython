@@ -10,6 +10,15 @@ class UserType:
     SuperUser = 0x4C
 
 
+def role_to_string(role):
+    if role == UserType.SuperUser:
+        return "Super User"
+    elif role == UserType.Administrator:
+        return "Administrator"
+    else:
+        return "Basic User"
+
+
 def permission_required(permission):
     def wrap(function):
         @wraps(function)
