@@ -4,9 +4,11 @@ from flask import render_template, redirect, flash, request, jsonify
 from flask_login import logout_user, login_user, current_user
 
 from . import admin
-from .forms import AdminLoginForm, CompanyRegistrationForm
+from .forms import AdminLoginForm, CompanyRegistrationForm, \
+    CreateSubscriptionForm
 from ..decorators import sudo_required, UserType
-from ..models import User, Country, State, City, Company, db, Product
+from ..models import User, Country, State, City, Company, db, Product, \
+    Subscription
 from ..utils import https_url_for
 
 
@@ -76,6 +78,15 @@ def create_company():
     return render_template('create_company.html', form=form)
 
 
+@admin.route('/subscribe/', methods=['GET'])
+@sudo_required
+def add_subscription():
+    form = CreateSubscriptionForm()
+    form.company_name.choices = [(company.id, company.name) for company in
+                                 Company.query.all()]
+    return render_template('create_subscription.html', form=form)
+
+
 @admin.route('/_get_states', methods=['GET'])
 @sudo_required
 def _get_states():
@@ -83,6 +94,22 @@ def _get_states():
     country = Country.query.filter_by(id=country_id).first()
     states = [(state.id, state.name) for state in country.states]
     return jsonify(states)
+
+
+@admin.route('/_get_key', methods=['GET'])
+@sudo_required
+def _get_key():
+    company_id = request.args.get('company_id', 1, type=int)
+    start = request.args.get('start')
+    end = request.args.get('end')
+    start_date = datetime.strptime(start, '%m/%d/%Y')
+    end_date = datetime.strptime(end, '%m/%d/%Y')
+    if not all((start_date, end_date)) or start_date >= end_date:
+        return jsonify({'error': 'Invalid dates'})
+    company_name = Company.query.get(company_id).name
+    key = Subscription.generate_subscription_token(company_id, company_name,
+                                                   start_date, end_date)
+    return jsonify({'key': key})
 
 
 @admin.route('/_products/', methods=['GET'])
@@ -102,6 +129,21 @@ def _get_staffs():
     staffs = [staff.to_json() for staff in User.query.with_deleted().filter_by(
         company_id=company_id).all()]
     return jsonify(staffs)
+
+
+@admin.route('/_subscriptions/', methods=['GET'])
+@sudo_required
+def _get_subscriptions():
+    company_id = request.args.get('company_id', 1, type=int)
+    last_subscription = Subscription.query.filter_by(
+        company_id=company_id).order_by(Subscription.id.desc()).first()
+    if last_subscription is None:
+        text = 'No subscriptions yet'
+    else:
+        start_date = last_subscription.begin_date.date()
+        to_date = last_subscription.end_date.date()
+        text = 'Between {} and {}'.format(start_date, to_date)
+    return jsonify({'last': text})
 
 
 @admin.route('/_get_cities', methods=['GET'])

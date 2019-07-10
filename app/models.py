@@ -280,22 +280,28 @@ class Subscription(db.Model):
     end_date = db.Column(db.DateTime, nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
 
+    def to_json(self):
+        return {'from': self.begin_date.isoformat(), 'to':
+            self.end_date.isoformat()}
+
     # we need these builtin functions in order to use the min-max functions
     # see the decorator implementation: `subscribed`
     def __lt__(self, other):
-        return self.end_date < other.end_date
+        return self.begin_date < other.begin_date or self.end_date < \
+               other.end_date
 
     def __gt__(self, other):
-        return self.end_date > other.end_date
+        return not (self < other)
 
     def __le__(self, other):
-        return self.end_date <= other.end_date
+        return (self < other) or (self == other)
 
     def __ge__(self, other):
-        return self.end_date >= other.end_date
+        return (self > other) or (self == other)
 
     def __eq__(self, other):
-        return (self.begin_date, self.end_date) == (other.begin_date, other.end_date)
+        return (self.begin_date == other.begin_date) and (self.end_date ==
+                                                    other.end_date)
 
     @staticmethod
     def generate_subscription_token(company_id, company_name, from_date, to_date):
@@ -308,10 +314,10 @@ class Subscription(db.Model):
     def verify_auth_token(token):
         s = JSONSerializer(current_app.config['SECRET_KEY'])
         try:
-            data_object = base64_decode(s.loads(token).decode('utf-8'))
-        except:
+            data_object = s.loads(base64_decode(token).decode())
+            return data_object.get('id'), data_object.get('from'), data_object.get('to')
+        except Exception as e:
             return None
-        return data_object.get('id'), data_object.get('from'), data_object.get('to')
 
 
 class Country(db.Model):

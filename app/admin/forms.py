@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, ValidationError, \
-    SelectField
+    SelectField, DateField, HiddenField
 from wtforms.validators import DataRequired, InputRequired, Email, EqualTo, \
-    Length
+    Length, Optional
 
 from ..models import Company, User
 
@@ -56,3 +58,28 @@ class CompanyRegistrationForm(FlaskForm):
     def validate_admin_email(self, field):
         if User.query.filter_by(personal_email=field.data).first():
             raise ValidationError('Email registered already')
+
+
+class CreateSubscriptionForm(FlaskForm):
+    company_name = SelectField('Select company', coerce=int, validators=[
+        DataRequired()], id='select_company')
+    last_subscription = StringField('Last subscription', id='last_sub',
+                                    render_kw={'disabled': ''},
+                                    validators=[Optional()])
+    date_from = DateField('Start date', validators=[DataRequired()],
+                          id='date_from', format='%m/%d/%Y')
+    date_to = DateField('End date', validators=[DataRequired()],
+                        id='date_to', format='%m/%d/%Y')
+    subscription_key = StringField('Key', id='key_field')
+
+    def validate_date_from(self, field):
+        today = datetime.utcnow().date()
+        chosen_date = field.data
+        if today < chosen_date:
+            raise ValidationError('Subscription date is invalid')
+
+    def validate_date_to(self, field):
+        today = datetime.utcnow().date()
+        chosen_date = field.data
+        if today < chosen_date or chosen_date < self.date_from.data:
+            raise ValidationError('Invalid date range')
