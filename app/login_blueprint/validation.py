@@ -52,6 +52,7 @@ def get_all_endpoints():
                         'list_users': https_url_for('api.list_users'),
                         'change_role': https_url_for('api.change_user_role', user_id=0),
                         'get_subscriptions': https_url_for('api.get_subscriptions'),
+                        'get_expiry': https_url_for('api.get_expiration'),
                         'add_subscription': https_url_for('api.add_subscription'),
                         'get_products': https_url_for('api.get_products'),
                         'get_product': https_url_for('api.get_product', product_id=0),

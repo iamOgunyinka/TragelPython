@@ -7,7 +7,7 @@ from sqlalchemy import Date, cast
 
 from . import v1_api as api
 from .. import db
-from ..decorators import paginate, permission_required, UserType
+from ..decorators import paginate, permission_required, UserType, fully_subscribed
 from ..models import Order, User, Confirmation
 from ..utils import send_response, log_activity, \
     date_from_string, SearchType, PaymentType
@@ -16,6 +16,7 @@ from ..utils import send_response, log_activity, \
 @api.route('/orders/', methods=['GET'])
 @permission_required(UserType.Administrator)
 @paginate('orders')
+@fully_subscribed
 def get_orders():
     date_from = date_from_string(request.args.get('from'), None)
     date_to = date_from_string(request.args.get('to'), None)
@@ -60,6 +61,7 @@ def get_orders():
 
 @api.route('/orders/<int:order_id>', methods=['GET'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def get_customer_orders(order_id):
     order = Order.query.filter_by(company_id=current_user.company_id,
                                   id=order_id).first()
@@ -70,6 +72,7 @@ def get_customer_orders(order_id):
 
 @api.route('/orders/confirm', methods=['GET'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def confirm_customer_order():
     details = base64.b64decode(request.args.get('payload')).decode()
     order_id, confirmation_date = details.split('@')
@@ -91,6 +94,7 @@ def confirm_customer_order():
 
 @api.route('/orders/count', methods=['GET'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def order_count():
     count = Order.query.filter_by(company_id=current_user.company_id).count()
     return send_response(200, {'count': count})
@@ -123,6 +127,7 @@ def new_customer_order():
 
 @api.route('/orders/', methods=['DELETE'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def delete_order():
     order_id = request.args.get('order_id', 0)
     reason = request.args.get('reason', '')

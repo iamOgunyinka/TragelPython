@@ -26,8 +26,8 @@ def permission_required(permission):
             if current_user is None or (current_user.role < permission):
                 response = jsonify({'status_code': 402,
                                     'message': 'Permission denied',
-                                    'status': 'Unable to get required '
-                                              'permission for this request'})
+                                    'status': 'This request is only allowed '
+                                              'for an administrator'})
                 response.status_code = 402
                 return response
             return function(*args, **kwargs)

@@ -1,6 +1,6 @@
 import functools
 
-from flask import url_for, request, jsonify
+from flask import url_for, request, jsonify, Response
 from functools import partial
 
 url_for = partial(url_for, _scheme='https', _external=True)
@@ -21,6 +21,9 @@ def paginate(collection, max_per_page=50):
         def wrapped(*args, **kwargs):
             # invoke the wrapped function
             query = f(*args, **kwargs)
+
+            if type(query) == Response:
+                return query.json
 
             # obtain pagination arguments from the URL's query string
             page = request.args.get('page', 1, type=int)

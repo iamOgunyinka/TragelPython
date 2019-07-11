@@ -3,13 +3,13 @@ from flask_login import login_required, current_user
 
 from . import v1_api as api
 from .. import db
-from ..decorators import paginate, UserType, permission_required
+from ..decorators import paginate, UserType, permission_required, fully_subscribed
 from ..models import Product
 from ..utils import send_response, log_activity
 
 
 @api.route('/products/', methods=['GET'])
-@permission_required(UserType.Administrator)
+@login_required
 @paginate('products')
 def get_products():
     return Product.query.filter_by(company_id=current_user.company_id)\
@@ -26,6 +26,7 @@ def get_product(product_id):
 
 @api.route('/products/', methods=['POST'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def new_product():
     items = Product.from_json(request.get_json(), current_user.company_id)
     if items is None:
@@ -43,6 +44,7 @@ def new_product():
 
 @api.route('/products/', methods=['DELETE'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def delete_product():
     product_id = request.args.get('product_id', 0, type=int)
     reason = request.args.get('reason', '')

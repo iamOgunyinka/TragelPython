@@ -4,13 +4,14 @@ from flask import request, jsonify
 from flask_login import current_user
 
 from . import v1_api
-from ..decorators import paginate, UserType, permission_required
+from ..decorators import paginate, UserType, permission_required, fully_subscribed
 from ..models import db, User
 from ..utils import is_all_type, find_occurrences, log_activity, send_response
 
 
 @v1_api.route('/create_user', methods=['POST'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def create_user():
     json_data = request.get_json()
     if json_data is None:
@@ -50,6 +51,7 @@ def create_user():
 
 @v1_api.route('/reset_password', methods=['POST'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def reset_password():
     json_data = request.get_json()
     if json_data is None:
@@ -78,6 +80,7 @@ def reset_password():
 
 @v1_api.route('/delete_user', methods=['DELETE'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def delete_user():
     payload = base64.b64decode(request.args.get('payload')).decode()
     payload = payload.split(':')
@@ -106,11 +109,11 @@ def delete_user():
 
 @v1_api.route('/change_role/', methods=['GET'])
 @permission_required(UserType.Administrator)
+@fully_subscribed
 def change_user_role():
     user_data = base64.b64decode(request.args.get('payload')).decode()
     user_id, role = user_data.split(':')
     user = User.query.get(int(user_id))
-    print('{}, {}, {}'.format(user_id, role, user))
     if not user or user.company_id != current_user.company_id:
         return send_response(404, 'The user with the information provided does '
                                   'not exist')
@@ -127,5 +130,6 @@ def change_user_role():
 @v1_api.route('/list_users', methods=['GET'])
 @permission_required(UserType.Administrator)
 @paginate("users")
+@fully_subscribed
 def list_users():
     return User.query.filter(User.company_id==current_user.company_id, User.id!=current_user.id)

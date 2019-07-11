@@ -38,3 +38,14 @@ def add_subscription():
     db.session.add(new_sub)
     db.session.commit()
     return send_response(200, 'Successful')
+
+
+@api.route('/expiry', methods=['GET'])
+@permission_required(UserType.Administrator)
+def get_expiration():
+    last_sub = Subscription.query.filter_by(
+        company_id=current_user.company_id).order_by(Subscription.id.desc())\
+        .first()
+    if not last_sub:
+        return send_response(200, 'No subscriptions has been made yet')
+    return send_response(200, last_sub.end_date.date().isoformat())
