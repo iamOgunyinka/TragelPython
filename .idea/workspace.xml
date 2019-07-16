@@ -3,16 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b79773e2-35db-4214-a6ce-5b9b8a60fa0a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/app/admin/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/admin/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/orders.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/orders.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/products.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/products.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/subscription.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/subscription.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/uploads.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/uploads.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api_v1/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api_v1/users.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/decorators/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/administrator_required.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/decorators/administrator_required.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/paginate.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/decorators/paginate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/decorators/subscribed.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/decorators/subscribed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/login_blueprint/validation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/login_blueprint/validation.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,7 +11,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -647,16 +637,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/admin/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="518">
-          <caret line="113" column="32" lean-forward="true" selection-start-line="113" selection-start-column="32" selection-end-line="113" selection-end-column="32" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/api_v1/subscription.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="398">
@@ -671,6 +651,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
           <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/admin/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="443">
+          <caret line="107" column="4" selection-start-line="107" selection-start-column="4" selection-end-line="107" selection-end-column="4" />
           <folding>
             <element signature="e#0#29#0" expanded="true" />
           </folding>
