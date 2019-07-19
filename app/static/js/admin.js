@@ -103,3 +103,19 @@ function show_staffs(url)
 	};
 	json_request.send();
 }
+
+function redirect_to_url(url)
+{
+    console.log(url);
+    if(confirm("You're being redirected to another page now, continue?")){
+        window.location = url;
+    }
+}
+
+function suspend_company(url)
+{
+    if(confirm("Are you absolutely sure you want to suspend this company?"))
+    {
+
+    }
+}

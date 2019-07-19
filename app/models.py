@@ -31,6 +31,8 @@ class Company(db.Model):
     subscriptions = db.relationship('Subscription', backref='company',
                                     lazy='dynamic')
     products = db.relationship('Product', backref='company')
+    headquarter_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
+    branches = db.relationship('Company')
 
     def __repr__(self):
         return '<Company: NAME -> {}, ID -> {}>'.format(self.name, self.id)
@@ -43,10 +45,13 @@ class Company(db.Model):
         city = City.query.filter_by(id=self.city_id).first()
         country = city.state.country.name if city else ''
         city = city.name if city else ''
-        return {'name': self.name, 'id': self.id, 'city': city,
-                'country': country, 'staffs': len(self.staffs),
-                'products': len(self.products),
-                'date': self.date_of_creation}
+        response = {'name': self.name, 'id': self.id, 'city': city,
+                    'country': country, 'staffs': len(self.staffs),
+                    'products': len(self.products),
+                    'date': self.date_of_creation}
+        if self.headquarter_id is None:
+            response['branches'] = len(self.branches)
+        return response
 
     @staticmethod
     def verify_auth_token(token):
@@ -253,6 +258,16 @@ class Order(db.Model):
         if self.payment_confirmed is not None:
             result['confirmation'] = self.payment_confirmed.to_json()
         return result
+
+
+class Stock(db.Model):
+    __tablename__ = 'stocks'
+
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, index=True, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    stock_time = db.Column(db.DateTime, nullable=False, unique=True)
+
 
 
 class Confirmation(db.Model):

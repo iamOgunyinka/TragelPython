@@ -58,3 +58,10 @@ def delete_product():
         return send_response(200, 'Successful')
     return send_response(404, 'There was an error processing the data sent in '
                               'your request')
+
+
+@api.route('/stock', method=['POST'])
+@permission_required(UserType.Administrator)
+@fully_subscribed
+def add_stock():
+    pass

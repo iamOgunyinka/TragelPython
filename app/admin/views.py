@@ -5,7 +5,7 @@ from flask_login import logout_user, login_user, current_user
 
 from . import admin
 from .forms import AdminLoginForm, CompanyRegistrationForm, \
-    CreateSubscriptionForm
+    CreateSubscriptionForm, BranchAddForm
 from ..decorators import sudo_required, UserType
 from ..models import User, Country, State, City, Company, db, Product, \
     Subscription
@@ -35,12 +35,29 @@ def admin_dashboard():
     return render_template('dashboard.html', name=name)
 
 
-@admin.route('/list_companies', methods=['GET', 'POST'])
+@admin.route('/suspend_company', methods=['GET'])
+@sudo_required
+def suspend_company(): # to-do
+    return render_template('dashboard.html', name=name)
+
+
+@admin.route('/list_companies', methods=['GET'])
 @sudo_required
 def list_companies():
-    companies = [company.to_json() for company in Company.query.all()]
+    query = Company.query.filter_by(headquarter_id=None)
+    companies = [company.to_json() for company in query.all()]
     return render_template('all_companies.html', companies=companies,
                            total=len(companies))
+
+
+@admin.route('/list_branches', methods=['GET'])
+@sudo_required
+def list_branches():
+    hq_id = request.args.get('hqid', type=int)
+    hq = Company.query.filter_by(id=hq_id).first()
+    branches = [branch.to_json() for branch in hq.branches]
+    return render_template('all_branches.html', companies=branches,
+                           total=len(branches), company_name=hq.name)
 
 
 @admin.route('/create_company', methods=['GET', 'POST'])
@@ -67,7 +84,7 @@ def create_company():
             db.session.add(new_company)
             db.session.add(company_admin)
             db.session.commit()
-            company_admin.username += ("@" + str(company_admin.id))
+            company_admin.username += ("@" + str(new_company.id))
             db.session.add(company_admin)
             db.session.commit()
             flash('Company added successfully')
@@ -76,6 +93,46 @@ def create_company():
             db.session.rollback()
             flash(str(e))
     return render_template('create_company.html', form=form)
+
+
+@admin.route('/create_branch', methods=['GET', 'POST'])
+@sudo_required
+def create_branch():
+    form = BranchAddForm()
+    form.country.choices = [(country.id, country.name) for country in
+                            Country.query.all()]
+    form.state.choices = [(state.id, state.name) for state in State.query.all()]
+    form.city.choices = [(city.id, city.name) for city in City.query.all()]
+    hq_id = request.args.get('hqid', -1, type=int)
+    if hq_id == -1:
+        flash('Please select a company to add branch to')
+        return redirect(https_url_for('admin.list_companies'))
+    hq = Company.query.get(hq_id)
+    if form.validate_on_submit():
+        address,city_id = form.address.data, form.city.data
+        admin_name, admin_username = form.admin.data, form.admin_username.data
+        admin_email, password = form.admin_email.data, form.admin_password.data
+        branch = Company(name=hq.name, official_email=hq.official_email,
+                              address=address, city_id=city_id,
+                              date_of_creation=datetime.utcnow())
+        branch_admin = User(fullname=admin_name, username=admin_username,
+                             personal_email=admin_email, address=address,
+                             password=password, role=UserType.Administrator)
+        branch.staffs.append(branch_admin)
+        hq.branches.append(branch)
+        try:
+            db.session.add(hq)
+            db.session.commit()
+            branch_admin.username += ("@" + str(branch.id))
+            db.session.add(branch_admin)
+            db.session.commit()
+            flash('Branch added successfully')
+            return redirect(https_url_for('admin.list_companies'))
+        except Exception as e:
+            db.session.rollback()
+            flash(str(e))
+    return render_template('create_branch.html', form=form,
+                           company_name=hq.name)
 
 
 @admin.route('/subscribe/', methods=['GET'])

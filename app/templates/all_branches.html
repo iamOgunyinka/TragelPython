@@ -6,7 +6,7 @@
           href="{{url_for('static', filename='img/favicon.ico')}}">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-	<title>All registered companies</title>
+	<title>{{company_name}} branches</title>
 
 	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
@@ -52,7 +52,7 @@
                         <p>Create company</p>
                     </a>
                 </li>
-                <li class="active">
+                <li>
                     <a href="{{url_for('admin.list_companies')}}">
                         <i class="pe-7s-graph"></i>
                         <p>List companies</p>
@@ -103,7 +103,8 @@
                             </div>
                             {% endfor %}
                             <div class="header">
-                                <h4 class="title">List of all registered companies</h4>
+                                <h4 class="title">List of braches for
+                                    {{company_name}}</h4>
                                 <p class="category">Totalling: {{total}}</p>
                             </div>
                             <div class="content table-responsive table-full-width">
@@ -111,14 +112,11 @@
                                     <thead>
                                         <th>S/N</th>
                                         <th>ID</th>
-                                    	<th>Name</th>
                                     	<th>Registration date</th>
                                     	<th>Country</th>
                                     	<th>City</th>
                                     	<th>Products</th>
                                     	<th>Staffs</th>
-                                    	<th>Branches</th>
-                                    	<th>Actions</th>
                                     </thead>
                                     <tbody>
                                     {% for company in companies %}
@@ -127,8 +125,7 @@
                                             {% set id= company.get('id') %}
                                         	<td>{{loop.index}}</td>
                                         	<td>{{id}}</td>
-                                        	<td>{{company.get('name')}}</td>
-                                            <td>{{moment(date).format('LLL')}}</td>
+                                        	<td>{{moment(date).format('LLL')}}</td>
                                         	<td>{{company.get('country')}}</td>
                                         	<td>{{company.get('city')}}</td>
                                             <td>
@@ -148,19 +145,6 @@
                                                 onclick="show_staffs('{{url_for('admin._get_staffs', company_id=id)}}');">
                                                 {{staffs}}</a>
 												{% else %} {{staffs}} {% endif %}
-                                            </td>
-                                            <td>{{company.get('branches')}}</td>
-                                            <td>
-                                                <select>
-                                                    <option></option>
-                                                    <option
-                                                            onclick="redirect_to_url('{{url_for('admin.create_branch', hqid=id)}}');">
-                                                        Add branch</option>
-                                                    {% if company.get('branches') != 0 %}
-                                                    <option
-                                                            onclick="redirect_to_url('{{url_for('admin.list_branches', hqid=id)}}');">List branches</option>
-                                                    {% endif %}
-                                                </select>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -194,7 +178,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -235,6 +218,11 @@
 $(document).ready(function(){
    $("#product_elem").hide();
    $("#staff_elem").hide();
+   var drop_down = {
+       action: $('#select_command'),
+       state: $('#select_state'),
+       city: $('#select_city')
+   };
 });
 </script>
 </html>
