@@ -1,9 +1,11 @@
+import json
 import logging
 import os
 import uuid
 from datetime import date
 from functools import partial
 
+import redis
 from flask import url_for as http_url_for, jsonify
 from flask_uploads import UploadNotAllowed
 
@@ -11,6 +13,10 @@ log_cfg = os.path.join(os.getcwd(), 'logs', 'all_logs.txt')
 logging.basicConfig(filename=log_cfg, filemode='a+',
                     format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 https_url_for = partial(http_url_for, _scheme='https', _external=True)
+
+data_cache = redis.StrictRedis()
+tragel_companies_tag = 'tragel:companies'
+
 
 
 class SearchType:
@@ -83,3 +89,14 @@ def upload(upload_object, request_object, company_id, data) -> dict:
         except UploadNotAllowed:
             return {'error': 'Upload type not allowed'}
     return {'error': 'Image contain invalid data'}
+
+
+def cache_companies_result(new_company, query):
+    cache = data_cache.hget(tragel_companies_tag, query)
+    if cache is None:
+        data_cache.hset(tragel_companies_tag, query, json.dumps(
+            new_company.to_json(with_isoformat=True)))
+    else:
+        cache = json.loads(cache.decode('utf-8'))
+        cache.append(new_company.to_json(with_isoformat=True))
+        data_cache.hset(tragel_companies_tag, query, json.dumps(cache))

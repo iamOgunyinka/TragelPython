@@ -11,4 +11,4 @@ def before_request():
     pass
 
 
-from . import validation
+from . import public_routes

@@ -24,7 +24,7 @@ class Company(db.Model):
     name = db.Column(db.String(128), index=True, nullable=False)
     official_email = db.Column(db.String(128), nullable=True)
     address = db.Column(db.String(256), nullable=False)
-    city_id = db.Column(db.Integer, nullable=False)
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
     date_of_creation = db.Column(db.DateTime, nullable=False, default=datetime.now)
     staffs = db.relationship('User', backref='company')
     orders = db.relationship('Order', backref='company')
@@ -41,14 +41,15 @@ class Company(db.Model):
         s = JSONSerializer(current_app.config['SECRET_KEY'])
         return s.dumps({'id': self.id}).decode('utf-8')
 
-    def to_json(self):
+    def to_json(self, with_isoformat=None):
         city = City.query.filter_by(id=self.city_id).first()
         country = city.state.country.name if city else ''
         city = city.name if city else ''
         response = {'name': self.name, 'id': self.id, 'city': city,
                     'country': country, 'staffs': len(self.staffs),
                     'products': len(self.products),
-                    'date': self.date_of_creation}
+                    'date': self.date_of_creation.isoformat() if
+                    with_isoformat else self.date_of_creation}
         if self.headquarter_id is None:
             response['branches'] = len(self.branches)
         return response

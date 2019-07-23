@@ -60,8 +60,8 @@ def delete_product():
                               'your request')
 
 
-@api.route('/stock', method=['POST'])
+@api.route('/stock', methods=['POST'])
 @permission_required(UserType.Administrator)
 @fully_subscribed
 def add_stock():
-    pass
+    return jsonify({})

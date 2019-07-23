@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask import render_template, redirect, flash, request, jsonify
-from flask_login import logout_user, login_user, current_user
+from flask_login import logout_user, login_user, current_user, login_required
 
 from . import admin
 from .forms import AdminLoginForm, CompanyRegistrationForm, \
@@ -9,7 +9,7 @@ from .forms import AdminLoginForm, CompanyRegistrationForm, \
 from ..decorators import sudo_required, UserType
 from ..models import User, Country, State, City, Company, db, Product, \
     Subscription
-from ..utils import https_url_for
+from ..utils import https_url_for, cache_companies_result
 
 
 @admin.route('/', methods=['GET', 'POST'])
@@ -38,6 +38,7 @@ def admin_dashboard():
 @admin.route('/suspend_company', methods=['GET'])
 @sudo_required
 def suspend_company(): # to-do
+    name = ''
     return render_template('dashboard.html', name=name)
 
 
@@ -87,6 +88,9 @@ def create_company():
             company_admin.username += ("@" + str(new_company.id))
             db.session.add(company_admin)
             db.session.commit()
+            city = City.query.get(city_id)
+            query = city.state.name + '~' + city.name
+            cache_companies_result(new_company, query)
             flash('Company added successfully')
             return redirect(https_url_for('admin.create_company'))
         except Exception as e:
@@ -126,6 +130,11 @@ def create_branch():
             branch_admin.username += ("@" + str(branch.id))
             db.session.add(branch_admin)
             db.session.commit()
+
+            city = City.query.get(city_id)
+            query = city.state.name + '~' + city.name
+            cache_companies_result(branch, query)
+
             flash('Branch added successfully')
             return redirect(https_url_for('admin.list_companies'))
         except Exception as e:
@@ -136,21 +145,29 @@ def create_branch():
 
 
 @admin.route('/subscribe/', methods=['GET'])
-@sudo_required
+@login_required
 def add_subscription():
     form = CreateSubscriptionForm()
     form.company_name.choices = [(company.id, company.name) for company in
-                                 Company.query.all()]
+                                 Company.query.filter_by(headquarter_id=None
+                                                         ).all()]
     return render_template('create_subscription.html', form=form)
 
 
 @admin.route('/_get_states', methods=['GET'])
-@sudo_required
+@login_required
 def _get_states():
     country_id = request.args.get('country_id', 1, type=int)
     country = Country.query.filter_by(id=country_id).first()
     states = [(state.id, state.name) for state in country.states]
     return jsonify(states)
+
+
+@admin.route('/_get_countries', methods=['GET'])
+@login_required
+def _get_countries():
+    countries = [(country.id, country.name) for country in Country.query.all()]
+    return jsonify(countries)
 
 
 @admin.route('/_get_key', methods=['GET'])
@@ -205,7 +222,6 @@ def _get_subscriptions():
 
 
 @admin.route('/_get_cities', methods=['GET'])
-@sudo_required
 def _get_cities():
     state_id = request.args.get('state_id', 1, type=int)
     state = State.query.filter_by(id=state_id).first()

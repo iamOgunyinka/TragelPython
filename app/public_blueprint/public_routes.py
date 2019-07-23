@@ -1,9 +1,9 @@
 from flask import request, jsonify
 from flask_login import login_user, logout_user, login_required
 
-from ..auth import su_auth
-from ..login_blueprint import login_api
-from ..models import User, Company
+from ..auth import su_auth, UserType
+from ..models import User, Company, db
+from ..public_blueprint import login_api
 from ..utils import is_all_type, is_valid_string, https_url_for, \
     send_response, log_activity
 
@@ -27,7 +27,7 @@ def login_route():
         login_user(user)
     except Exception as e:
         log_activity('LOGIN[login_route]', by_=username, for_=username, why_=str(e))
-        return send_response(402, 'You tried to login with a badly formed credential')
+        return send_response(402, 'You tried to login with a bad credential')
     return send_response(200, 'Logged in')
 
 
@@ -75,4 +75,31 @@ def get_all_endpoints():
 
 @login_api.route('/ping', methods=['GET'])
 def echo_ping():
+    return send_response(200, 'OK')
+
+
+@login_api.route('/create_user', methods=['POST'])
+def create_user():
+    json_data = request.get_json()
+    if json_data is None:
+        return send_response(401, 'This request contains no user data')
+    fullname = json_data.get('fullname')
+    personal_address = json_data.get('address')
+    personal_email = json_data.get('email')
+    username = json_data.get('username')
+    password = json_data.get('password')
+    role = UserType.BasicUser
+    if User.query.filter_by(username=username).first():
+        return send_response(401, 'Username already registered')
+    if User.query.filter_by(personal_email=personal_email).first():
+        return send_response(401, 'Email already registered')
+    user = User(username=username, password=password, personal_email=personal_email,
+                role=role, company_id=1, fullname=fullname, address=personal_address)
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        log_activity('EXCEPTION[create_user]', username, '', str(e))
+        return send_response(403, 'Unable to add the user to our network')
     return send_response(200, 'OK')

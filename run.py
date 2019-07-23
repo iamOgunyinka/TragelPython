@@ -33,8 +33,7 @@ def first_request():
     if Country.query.get(1) is None:
         add_country()
     if User.query.get(1) is None:
-        company = Company(name='Tragel Group', address='Orita-Iloko',
-                          city_id=1)
+        company = Company(name='General Public', address='', city_id=1)
         super_user = User(fullname='Joshua', username='iamOgunyinka',
                           personal_email='ogunyinkajoshua@yahoo.com',
                           password='password', role=UserType.SuperUser)
