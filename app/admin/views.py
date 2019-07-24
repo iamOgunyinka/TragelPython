@@ -179,7 +179,7 @@ def _get_key():
     start_date = datetime.strptime(start, '%m/%d/%Y').date()
     end_date = datetime.strptime(end, '%m/%d/%Y').date()
     now = datetime.utcnow().date()
-    if not all((start_date, end_date, start_date >= end_date, start_date <now)):
+    if not all((start_date, end_date)) or start_date >= end_date or start_date <now:
         return jsonify({'error': 'Please check that the dates are valid'})
     company_name = Company.query.get(company_id).name
     key = Subscription.generate_subscription_token(company_id, company_name,

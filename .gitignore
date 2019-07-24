@@ -6,6 +6,11 @@ __pycache__/
 # Launch file
 *.csh
 
+#Log files
+stderr_log
+stdout_log
+
+
 # C extensions
 *.so
 
