@@ -26,6 +26,7 @@ class Company(db.Model):
     address = db.Column(db.String(256), nullable=False)
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
     date_of_creation = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    subscription_active = db.Column(db.Boolean(), default=False, nullable=False)
     staffs = db.relationship('User', backref='company')
     orders = db.relationship('Order', backref='company')
     subscriptions = db.relationship('Subscription', backref='company',
@@ -113,8 +114,9 @@ class User(db.Model, UserMixin):
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     role = db.Column(db.SmallInteger, nullable=False)
     deleted = db.Column(db.Boolean(), default=False, nullable=False)
-
+    is_confirmed = db.Column(db.Boolean(), default=True, nullable=False)
     query_class = SoftDeletedQuery
+
 
     def __repr__(self):
         return '<User {}, {}, {}>'.format(self.fullname, self.username, self.company)
@@ -320,10 +322,10 @@ class Subscription(db.Model):
                                                     other.end_date)
 
     @staticmethod
-    def generate_subscription_token(company_id, company_name, from_date, to_date):
+    def generate_subscription_token(company_name, from_date, to_date):
         serializer = JSONSerializer(current_app.config['SECRET_KEY'])
-        obj = {'id': company_id, 'company': company_name,
-               'from': from_date.isoformat(), 'to': to_date.isoformat() }
+        obj = {'company': company_name, 'from': from_date.isoformat(),
+               'to': to_date.isoformat()}
         return base64_encode(serializer.dumps(obj)).decode('utf-8')
 
     @staticmethod
@@ -331,7 +333,8 @@ class Subscription(db.Model):
         s = JSONSerializer(current_app.config['SECRET_KEY'])
         try:
             data_object = s.loads(base64_decode(token).decode())
-            return data_object.get('id'), data_object.get('from'), data_object.get('to')
+            return data_object.get('name'), data_object.get('from'), \
+                   data_object.get('to')
         except Exception as e:
             return None
 

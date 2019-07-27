@@ -3,7 +3,8 @@ from flask_login import login_required, current_user
 
 from . import v1_api as api
 from .. import db
-from ..decorators import paginate, UserType, permission_required, fully_subscribed
+from ..decorators import paginate, UserType, permission_required, \
+    fully_subscribed
 from ..models import Product
 from ..utils import send_response, log_activity
 
@@ -14,6 +15,13 @@ from ..utils import send_response, log_activity
 def get_products():
     return Product.query.filter_by(company_id=current_user.company_id)\
         .order_by(Product.id)
+
+
+@api.route('/get_products/<int:company_id>', methods=['GET'])
+@login_required
+def get_company_products(company_id):
+    return Product.query.filter_by(company_id=company_id).order_by(
+        Product.name).all()
 
 
 @api.route('/products/<int:product_id>', methods=['GET'])

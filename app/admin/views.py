@@ -37,7 +37,7 @@ def admin_dashboard():
 
 @admin.route('/suspend_company', methods=['GET'])
 @sudo_required
-def suspend_company(): # to-do
+def suspend_company():  # to-do
     name = ''
     return render_template('dashboard.html', name=name)
 
@@ -71,7 +71,7 @@ def create_company():
     form.city.choices = [(city.id, city.name) for city in City.query.all()]
     if form.validate_on_submit():
         company_name, email = form.name.data, form.email.data
-        address,city_id = form.address.data, form.city.data
+        address, city_id = form.address.data, form.city.data
         admin_name, admin_username = form.admin.data, form.admin_username.data
         admin_email, password = form.admin_email.data, form.admin_password.data
         new_company = Company(name=company_name, official_email=email,
@@ -113,15 +113,15 @@ def create_branch():
         return redirect(https_url_for('admin.list_companies'))
     hq = Company.query.get(hq_id)
     if form.validate_on_submit():
-        address,city_id = form.address.data, form.city.data
+        address, city_id = form.address.data, form.city.data
         admin_name, admin_username = form.admin.data, form.admin_username.data
         admin_email, password = form.admin_email.data, form.admin_password.data
         branch = Company(name=hq.name, official_email=hq.official_email,
-                              address=address, city_id=city_id,
-                              date_of_creation=datetime.utcnow())
+                         address=address, city_id=city_id,
+                         date_of_creation=datetime.utcnow())
         branch_admin = User(fullname=admin_name, username=admin_username,
-                             personal_email=admin_email, address=address,
-                             password=password, role=UserType.Administrator)
+                            personal_email=admin_email, address=address,
+                            password=password, role=UserType.Administrator)
         branch.staffs.append(branch_admin)
         hq.branches.append(branch)
         try:
@@ -149,8 +149,8 @@ def create_branch():
 def add_subscription():
     form = CreateSubscriptionForm()
     form.company_name.choices = [(company.id, company.name) for company in
-                                 Company.query.filter_by(headquarter_id=None
-                                                         ).all()]
+                                 Company.query.filter_by(headquarter_id=None)
+                                     .all()]
     return render_template('create_subscription.html', form=form)
 
 
@@ -179,11 +179,12 @@ def _get_key():
     start_date = datetime.strptime(start, '%m/%d/%Y').date()
     end_date = datetime.strptime(end, '%m/%d/%Y').date()
     now = datetime.utcnow().date()
-    if not all((start_date, end_date, start_date >= end_date, start_date <now)):
+    if not all(
+            (start_date, end_date, start_date >= end_date, start_date < now)):
         return jsonify({'error': 'Please check that the dates are valid'})
     company_name = Company.query.get(company_id).name
-    key = Subscription.generate_subscription_token(company_id, company_name,
-                                                   start_date, end_date)
+    key = Subscription.generate_subscription_token(company_name, start_date,
+                                                   end_date)
     return jsonify({'key': key})
 
 
@@ -193,7 +194,7 @@ def _get_products():
     company_id = request.args.get('company_id', 1, type=int)
     products = [product.to_json() for product in
                 Product.query.with_deleted().filter_by(
-        company_id=company_id).all()]
+                    company_id=company_id).all()]
     return jsonify(products)
 
 
