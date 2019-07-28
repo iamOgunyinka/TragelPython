@@ -33,7 +33,7 @@ def first_request():
     if Country.query.get(1) is None:
         add_country()
     if User.query.get(1) is None:
-        company = Company(name='General Public', address='', city_id=1)
+        company = Company(name='General Public', address='', city_id=301)
         super_user = User(fullname='Joshua', username='iamOgunyinka',
                           personal_email='ogunyinkajoshua@yahoo.com',
                           password='password', role=UserType.SuperUser)
@@ -41,8 +41,3 @@ def first_request():
         db.session.add(company)
         db.session.add(super_user)
         db.session.commit()
-
-
-if  __name__ == '__main__':
-    # create a development user
-    app.run(debug=True, port=6000)
