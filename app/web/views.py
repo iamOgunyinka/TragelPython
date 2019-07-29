@@ -21,9 +21,9 @@ def login_route():
         user = User.query.filter_by(username=username).first()
         if user is None or user.verify_password(password) is False:
             flash('Invalid username or password')
-            return redirect(https_url_for('admin.login_route'))
+            return redirect(https_url_for('web.login_route'))
         login_user(user)
-        return redirect(https_url_for('admin.admin_dashboard'))
+        return redirect(https_url_for('web.admin_dashboard'))
     else:
         return render_template('login.html', form=form)
 
@@ -92,7 +92,7 @@ def create_company():
             query = city.state.name + '~' + city.name
             cache_companies_result(new_company, query)
             flash('Company added successfully')
-            return redirect(https_url_for('admin.create_company'))
+            return redirect(https_url_for('web.create_company'))
         except Exception as e:
             db.session.rollback()
             flash(str(e))
@@ -110,7 +110,7 @@ def create_branch():
     hq_id = request.args.get('hqid', -1, type=int)
     if hq_id == -1:
         flash('Please select a company to add branch to')
-        return redirect(https_url_for('admin.list_companies'))
+        return redirect(https_url_for('web.list_companies'))
     hq = Company.query.get(hq_id)
     if form.validate_on_submit():
         address, city_id = form.address.data, form.city.data
@@ -136,7 +136,7 @@ def create_branch():
             cache_companies_result(branch, query)
 
             flash('Branch added successfully')
-            return redirect(https_url_for('admin.list_companies'))
+            return redirect(https_url_for('web.list_companies'))
         except Exception as e:
             db.session.rollback()
             flash(str(e))
@@ -234,4 +234,4 @@ def _get_cities():
 @sudo_required
 def logout_route():
     logout_user()
-    return redirect(https_url_for('admin.login_route'))
+    return redirect(https_url_for('web.login_route'))

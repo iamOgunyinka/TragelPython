@@ -40,19 +40,19 @@
             </div>
             <ul class="nav">
                 <li>
-                    <a href="{{url_for('admin.admin_dashboard')}}">
+                    <a href="{{url_for('web.admin_dashboard')}}">
                         <i class="pe-7s-graph"></i>
                         <p>Dashboard</p>
                     </a>
                 </li>
                 <li>
-                    <a href="{{url_for('admin.create_company')}}">
+                    <a href="{{url_for('web.create_company')}}">
                         <i class="pe-7s-graph"></i>
                         <p>Create company</p>
                     </a>
                 </li>
                 <li>
-                    <a href="{{url_for('admin.list_companies')}}">
+                    <a href="{{url_for('web.list_companies')}}">
                         <i class="pe-7s-graph"></i>
                         <p>List companies</p>
                     </a>
@@ -96,7 +96,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{url_for('admin.logout_route')}}">
+                            <a href="{{url_for('web.logout_route')}}">
                                 <p>Log out</p>
                             </a>
                         </li>
@@ -182,7 +182,7 @@ $(function(){
             company_id: drop_down.company.val()
         };
         sub_field.last_sub.attr('disabled', 'disabled');
-        $.getJSON("{{url_for('admin._get_subscriptions')}}", send, function
+        $.getJSON("{{url_for('web._get_subscriptions')}}", send, function
         (data)
         {
             $('#last_sub').val(data.last);
@@ -198,7 +198,7 @@ $(function(){
             end: sub_field.end_date.val()
         };
         sub_field.key_field.attr('disabled', 'disabled');
-        $.getJSON("{{url_for('admin._get_key')}}", send, function
+        $.getJSON("{{url_for('web._get_key')}}", send, function
         (data)
         {
             if( data.error === undefined ){

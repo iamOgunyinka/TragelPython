@@ -5,6 +5,7 @@ from . import v1_api as api
 from ..decorators import paginate, UserType, permission_required
 from ..models import Subscription, db
 from ..utils import send_response
+from datetime import datetime
 
 
 @api.route('/subscriptions/', methods=['GET'])
@@ -23,12 +24,15 @@ def add_subscription():
     if data is None:
         return send_response(400, 'Invalid or used token')
     company_name, date_from, date_to = data
-    ex_token = Subscription.query.filter_by(token=token)
-    if not ((current_user.company.name == company_name) or ex_token.first()):
-        return send_response(401, 'Forbidden', 'Expired or unauthorized token')
-    new_sub = Subscription(begin_date=date_from, end_date=date_to,
-                           company_id=current_user.company.id, token=token)
-    current_user.company.subscriptions.append(new_sub)
+    ex_token = Subscription.query.filter_by(token=token).first()
+    if (current_user.company.name != company_name) or ex_token:
+        return send_response(401, 'Invalid or used token')
+    start_date = datetime.strptime(date_from, '%Y-%m-%d').date()
+    end_date = datetime.strptime(date_to, '%Y-%m-%d').date()
+    print(start_date, end_date)
+
+    new_sub = Subscription(begin_date=start_date, end_date=end_date,
+                           company_id=current_user.company_id, token=token)
     current_user.company.subscription_active = True
     db.session.add(current_user.company)
     db.session.add(new_sub)

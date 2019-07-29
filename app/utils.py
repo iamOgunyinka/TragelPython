@@ -95,7 +95,7 @@ def cache_companies_result(new_company, query):
     cache = data_cache.hget(tragel_companies_tag, query)
     if cache is None:
         data_cache.hset(tragel_companies_tag, query, json.dumps(
-            new_company.to_json(with_isoformat=True)))
+            [new_company.to_json(with_isoformat=True)]))
     else:
         cache = json.loads(cache.decode('utf-8'))
         cache.append(new_company.to_json(with_isoformat=True))

@@ -40,8 +40,8 @@ def create_app(config_name):
     from .public_blueprint import login_api
     app.register_blueprint(login_api, url_prefix='/auth')
 
-    from .admin import admin as admin_blueprint
-    app.register_blueprint(admin_blueprint, url_prefix='/admin')
+    from .web import admin as admin_blueprint
+    app.register_blueprint(admin_blueprint, url_prefix='/web')
 
     from .api_v1 import images as image_object
     configure_uploads(app, (image_object, ))

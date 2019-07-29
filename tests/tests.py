@@ -2,45 +2,49 @@ import unittest
 from werkzeug.exceptions import NotFound
 from app import create_app, db
 from app.models import User, Order
+from app.auth import UserType
 from .test_client import TestClient
 
 
 class TestAPI(unittest.TestCase):
-    default_username = 'dave'
-    default_password = 'cat'
+    default_username = 'iamOgunyinka'
+    default_password = 'password'
 
     def setUp(self):
-        self.app = create_app('testing')
+        self.app = create_app('development')
         self.ctx = self.app.app_context()
         self.ctx.push()
         db.drop_all()
         db.create_all()
-        u = User(username=self.default_username)
-        u.set_password(self.default_password)
+        u = User(fullname='Joshua', username='iamOgunyinka',
+                 personal_email='ogunyinkajoshua@yahoo.com',
+                 password='password', role=UserType.SuperUser)
         db.session.add(u)
         db.session.commit()
-        self.client = TestClient(self.app, u.generate_auth_token(), '')
+        self.client = TestClient(self.app, u)
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
         self.ctx.pop()
 
-    def test_customers(self):
-        # get list of customers
-        rv, json = self.client.get('/api/v1/customers/')
+    def test_validation(self):
+        # get preliminary validation stuffs
+        auth_client = TestClient(self.app, username=self.default_username,
+                                 password='password')
+        rv, json = auth_client.get('/auth/endpoints')
         self.assertTrue(rv.status_code == 200)
-        self.assertTrue(json['customers'] == [])
+        self.assertTrue(json['endpoints'] == [])
 
         # add a customer
-        rv, json = self.client.post('/api/v1/customers/',
+        rv, json = auth_client.post('/api/v1/customers/',
                                     data={'name': 'john'})
         self.assertTrue(rv.status_code == 201)
         location = rv.headers['Location']
-        rv, json = self.client.get(location)
+        rv, json = auth_client.get(location)
         self.assertTrue(rv.status_code == 200)
         self.assertTrue(json['name'] == 'john')
-        rv, json = self.client.get('/api/v1/customers/')
+        rv, json = auth_client.get('/api/v1/customers/')
         self.assertTrue(rv.status_code == 200)
         self.assertTrue(json['customers'] == [location])
 
