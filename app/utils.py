@@ -14,7 +14,9 @@ logging.basicConfig(filename=log_cfg, filemode='a+',
                     format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 https_url_for = partial(http_url_for, _scheme='https', _external=True)
 
-data_cache = redis.StrictRedis()
+cache_pass,port_number=os.environ.get('redis_pass'),int(os.environ.get('redis_port'))
+data_cache = redis.StrictRedis(password=cache_pass,port=port_number)
+# data_cache = redis.StrictRedis()
 tragel_companies_tag = 'tragel:companies'
 
 
