@@ -40,25 +40,25 @@
             </div>
             <ul class="nav">
                 <li>
-                    <a href="{{url_for('admin.admin_dashboard')}}">
+                    <a href="{{url_for('web.admin_dashboard')}}">
                         <i class="pe-7s-graph"></i>
                         <p>Dashboard</p>
                     </a>
                 </li>
                 <li class="active">
-                    <a href="{{url_for('admin.create_company')}}">
+                    <a href="{{url_for('web.create_company')}}">
                         <i class="pe-7s-graph"></i>
                         <p>Create company</p>
                     </a>
                 </li>
                 <li>
-                    <a href="{{url_for('admin.list_companies')}}">
+                    <a href="{{url_for('web.list_companies')}}">
                         <i class="pe-7s-graph"></i>
                         <p>List companies</p>
                     </a>
                 </li>
                 <li>
-                    <a href="{{url_for('admin.add_subscription')}}">
+                    <a href="{{url_for('web.add_subscription')}}">
                         <i class="pe-7s-user"></i>
                         <p>Subscriptions</p>
                     </a>
@@ -96,7 +96,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{url_for('admin.logout_route')}}">
+                            <a href="{{url_for('web.logout_route')}}">
                                 <p>Log out</p>
                             </a>
                         </li>
@@ -176,7 +176,7 @@
 	        };
 	        drop_down.state.attr('disabled', 'disabled');
 	        drop_down.state.empty();
-	        $.getJSON("{{url_for('admin._get_states')}}", send, function(data){
+	        $.getJSON("{{url_for('web._get_states')}}", send, function(data){
 		        data.forEach(function(item){
 			        drop_down.state.append($('<option>', {
 				        value: item[0],
@@ -193,7 +193,7 @@
 	        };
 	        drop_down.city.attr('disabled', 'disabled');
 	        drop_down.city.empty();
-	        $.getJSON("{{url_for('admin._get_cities')}}", send, function(data){
+	        $.getJSON("{{url_for('web._get_cities')}}", send, function(data){
 		        data.forEach(function(item){
 			        drop_down.city.append($('<option>', {
 				        value: item[0],

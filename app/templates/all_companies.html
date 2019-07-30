@@ -41,25 +41,25 @@
 
             <ul class="nav">
                 <li>
-                    <a href="{{url_for('admin.admin_dashboard')}}"><i
+                    <a href="{{url_for('web.admin_dashboard')}}"><i
                             class="pe-7s-graph"></i>
                         <p>Dashboard</p>
                     </a>
                 </li>
                 <li>
-                    <a href="{{url_for('admin.create_company')}}">
+                    <a href="{{url_for('web.create_company')}}">
                         <i class="pe-7s-graph"></i>
                         <p>Create company</p>
                     </a>
                 </li>
                 <li class="active">
-                    <a href="{{url_for('admin.list_companies')}}">
+                    <a href="{{url_for('web.list_companies')}}">
                         <i class="pe-7s-graph"></i>
                         <p>List companies</p>
                     </a>
                 </li>
                 <li>
-                    <a href="{{url_for('admin.add_subscription')}}">
+                    <a href="{{url_for('web.add_subscription')}}">
                         <i class="pe-7s-user"></i>
                         <p>Subscriptions</p>
                     </a>
@@ -79,7 +79,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{url_for('admin.logout_route')}}">
+                            <a href="{{url_for('web.logout_route')}}">
                                 <p>Log out</p>
                             </a>
                         </li>
@@ -135,7 +135,7 @@
 												{% set products = company.get('products') %}
 												{% if products != 0 %}
 												<a href="javascript:void(0);"
-                                                onclick="show_products('{{url_for('admin._get_products', company_id=id)}}');">
+                                                onclick="show_products('{{url_for('web._get_products', company_id=id)}}');">
                                                 {{products}}</a>
 												{% else %}
 												{{products}}
@@ -145,7 +145,7 @@
 												{% set staffs = company.get('staffs') %}
 												{% if staffs != 0 %}
 												<a href="javascript:void(0);"
-                                                onclick="show_staffs('{{url_for('admin._get_staffs', company_id=id)}}');">
+                                                onclick="show_staffs('{{url_for('web._get_staffs', company_id=id)}}');">
                                                 {{staffs}}</a>
 												{% else %} {{staffs}} {% endif %}
                                             </td>
@@ -154,11 +154,11 @@
                                                 <select>
                                                     <option></option>
                                                     <option
-                                                            onclick="redirect_to_url('{{url_for('admin.create_branch', hqid=id)}}');">
+                                                            onclick="redirect_to_url('{{url_for('web.create_branch', hqid=id)}}');">
                                                         Add branch</option>
                                                     {% if company.get('branches') != 0 %}
                                                     <option
-                                                            onclick="redirect_to_url('{{url_for('admin.list_branches', hqid=id)}}');">List branches</option>
+                                                            onclick="redirect_to_url('{{url_for('web.list_branches', hqid=id)}}');">List branches</option>
                                                     {% endif %}
                                                 </select>
                                             </td>

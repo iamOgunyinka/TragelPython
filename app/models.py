@@ -141,7 +141,8 @@ class User(db.Model, UserMixin):
 
 
 class Anonymous(AnonymousUserMixin):
-    def verify_password(self):
+    @staticmethod
+    def verify_password():
         return False
 
     @property
@@ -158,6 +159,8 @@ class Product(db.Model):
     name = db.Column(db.String(64), index=True, nullable=False, unique=False)
     price = db.Column(db.Float, nullable=False, unique=False)
     thumbnail = db.Column(db.String(128), nullable=True, unique=False)
+    category = db.Column(db.String(256), nullable= False)
+    description = db.Column(db.String(256), nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
@@ -166,22 +169,22 @@ class Product(db.Model):
     @staticmethod
     def from_json(json_data, company_id):
         items = []
-        if json_data is None: return json_data
+        if not json_data:
+            raise ValueError('There are some missing data in the request')
         for json_object in json_data:
-            product_name = json_object.get('name', '')
             product_price = json_object.get('price', 0.0)
+            product_name = json_object.get('name', '')
             thumbnail_url = json_object.get('thumbnail', '')
+            description = json_object.get('desc', '')
+            category = json_object.get('cat', '')
+            product = Product.query.filter_by(company_id=company_id,
+                                              name=product_name).first()
+            if product:
+                raise ValueError('Product with that name already exist')
             new_product = Product(name=product_name, price=product_price,
+                                  category=category, description=description,
                                   company_id=company_id, thumbnail=thumbnail_url)
-            product_id = int(json_object.get('id', 0))
-            existing_product = Product.query.get(product_id)
-            if existing_product is not None:
-                if not existing_product == new_product:
-                    existing_product.deleted = True
-                    items.append(existing_product)
-                    items.append(new_product)
-            else:
-                items.append(new_product)
+            items.append(new_product)
         return items
 
     def __eq__(self, other):
@@ -191,8 +194,9 @@ class Product(db.Model):
     def to_json(self):
         return {
             'name': self.name, 'price': self.price, 'deleted': self.deleted,
-            'thumbnail': self.thumbnail, 'id': self.id,
-            'url': https_url_for('api.get_product', product_id=self.id),
+            'thumbnail': self.thumbnail, 'id': self.id, 'cat': self.category,
+            'desc': self.description, 'url': https_url_for('api.get_product',
+                                                           product_id=self.id),
         }
 
     def __repr__(self):
@@ -294,8 +298,8 @@ class Subscription(db.Model):
     __tablename__ = 'subscriptions'
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.Text, nullable=False)
-    begin_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
+    begin_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
 
     def to_json(self):
@@ -333,9 +337,9 @@ class Subscription(db.Model):
         s = JSONSerializer(current_app.config['SECRET_KEY'])
         try:
             data_object = s.loads(base64_decode(token).decode())
-            return data_object.get('name'), data_object.get('from'), \
+            return data_object.get('company'), data_object.get('from'), \
                    data_object.get('to')
-        except Exception as e:
+        except Exception:
             return None
 
 

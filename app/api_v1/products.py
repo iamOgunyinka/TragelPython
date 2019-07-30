@@ -36,16 +36,16 @@ def get_product(product_id):
 @permission_required(UserType.Administrator)
 @fully_subscribed
 def new_product():
-    items = Product.from_json(request.get_json(), current_user.company_id)
-    if items is None:
-        return send_response(417, 'There are some missing data in the request')
     try:
+        items = Product.from_json(request.get_json(), current_user.company_id)
         db.session.add_all(items)
         db.session.commit()
+    except ValueError as v_e:
+        return send_response(400, str(v_e))
     except Exception as e:
         db.session.rollback()
-        log_activity('EXCEPTION[new_products]',
-                     current_user.username, [items], str(e))
+        log_activity('EXCEPTION[new_products]', current_user.username, [],
+                     str(e))
         return send_response(403, 'Unable to add products')
     return send_response(200, 'Products added')
 
