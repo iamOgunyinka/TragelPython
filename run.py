@@ -41,3 +41,4 @@ def first_request():
         db.session.add(company)
         db.session.add(super_user)
         db.session.commit()
+
