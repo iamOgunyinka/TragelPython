@@ -34,21 +34,25 @@ def create_app(config_name):
     moment.init_app(app)
 
     # register blueprints
-    from .api_v1 import v1_api as api
+    from .cp_client import v1_api as api
     app.register_blueprint(api, url_prefix='/api/v1')
 
     from .public_blueprint import login_api
     app.register_blueprint(login_api, url_prefix='/auth')
 
-    from .web import admin as admin_blueprint
+    from .web_client import web_admin as admin_blueprint
     app.register_blueprint(admin_blueprint, url_prefix='/web')
 
-    from .api_v1 import images as image_object
+    from .mobile_client import mobile_api
+    app.register_blueprint(mobile_api, url_prefix='/mobile')
+
+    from .cp_client import images as image_object
     configure_uploads(app, (image_object, ))
     patch_request_class(app, size=150 * 1024)  # 150KB max
 
     csrf.exempt(api)
     csrf.exempt(login_api)
+    csrf.exempt(mobile_api)
 
     # register an after request handler
     @app.after_request

@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import render_template, redirect, flash, request, jsonify
 from flask_login import logout_user, login_user, current_user, login_required
 
-from . import admin
+from . import web_admin
 from .forms import AdminLoginForm, CompanyRegistrationForm, \
     CreateSubscriptionForm, BranchAddForm
 from ..decorators import sudo_required, UserType
@@ -12,7 +12,7 @@ from ..models import User, Country, State, City, Company, db, Product, \
 from ..utils import https_url_for, cache_companies_result
 
 
-@admin.route('/', methods=['GET', 'POST'])
+@web_admin.route('/', methods=['GET', 'POST'])
 def login_route():
     form = AdminLoginForm()
     if form.validate_on_submit():
@@ -28,21 +28,21 @@ def login_route():
         return render_template('login.html', form=form)
 
 
-@admin.route('/dashboard', methods=['GET'])
+@web_admin.route('/dashboard', methods=['GET'])
 @sudo_required
 def admin_dashboard():
     name = current_user.fullname
     return render_template('dashboard.html', name=name)
 
 
-@admin.route('/suspend_company', methods=['GET'])
+@web_admin.route('/suspend_company', methods=['GET'])
 @sudo_required
 def suspend_company():  # to-do
     name = ''
     return render_template('dashboard.html', name=name)
 
 
-@admin.route('/list_companies', methods=['GET'])
+@web_admin.route('/list_companies', methods=['GET'])
 @sudo_required
 def list_companies():
     query = Company.query.filter_by(headquarter_id=None)
@@ -51,7 +51,7 @@ def list_companies():
                            total=len(companies))
 
 
-@admin.route('/list_branches', methods=['GET'])
+@web_admin.route('/list_branches', methods=['GET'])
 @sudo_required
 def list_branches():
     hq_id = request.args.get('hqid', type=int)
@@ -61,7 +61,7 @@ def list_branches():
                            total=len(branches), company_name=hq.name)
 
 
-@admin.route('/create_company', methods=['GET', 'POST'])
+@web_admin.route('/create_company', methods=['GET', 'POST'])
 @sudo_required
 def create_company():
     form = CompanyRegistrationForm()
@@ -92,14 +92,14 @@ def create_company():
             query = city.state.name + '~' + city.name
             cache_companies_result(new_company, query)
             flash('Company added successfully')
-            return redirect(https_url_for('web.create_company'))
+            return redirect(https_url_for('web_client.create_company'))
         except Exception as e:
             db.session.rollback()
             flash(str(e))
     return render_template('create_company.html', form=form)
 
 
-@admin.route('/create_branch', methods=['GET', 'POST'])
+@web_admin.route('/create_branch', methods=['GET', 'POST'])
 @sudo_required
 def create_branch():
     form = BranchAddForm()
@@ -136,7 +136,7 @@ def create_branch():
             cache_companies_result(branch, query)
 
             flash('Branch added successfully')
-            return redirect(https_url_for('web.list_companies'))
+            return redirect(https_url_for('web_client.list_companies'))
         except Exception as e:
             db.session.rollback()
             flash(str(e))
@@ -144,7 +144,7 @@ def create_branch():
                            company_name=hq.name)
 
 
-@admin.route('/subscribe/', methods=['GET'])
+@web_admin.route('/subscribe/', methods=['GET'])
 @login_required
 def add_subscription():
     form = CreateSubscriptionForm()
@@ -154,7 +154,7 @@ def add_subscription():
     return render_template('create_subscription.html', form=form)
 
 
-@admin.route('/_get_states', methods=['GET'])
+@web_admin.route('/_get_states', methods=['GET'])
 @login_required
 def _get_states():
     country_id = request.args.get('country_id', 1, type=int)
@@ -163,14 +163,14 @@ def _get_states():
     return jsonify(states)
 
 
-@admin.route('/_get_countries', methods=['GET'])
+@web_admin.route('/_get_countries', methods=['GET'])
 @login_required
 def _get_countries():
     countries = [(country.id, country.name) for country in Country.query.all()]
     return jsonify(countries)
 
 
-@admin.route('/_get_key', methods=['GET'])
+@web_admin.route('/_get_key', methods=['GET'])
 @sudo_required
 def _get_key():
     company_id = request.args.get('company_id', 1, type=int)
@@ -188,7 +188,7 @@ def _get_key():
     return jsonify({'key': key})
 
 
-@admin.route('/_products/', methods=['GET'])
+@web_admin.route('/_products/', methods=['GET'])
 @sudo_required
 def _get_products():
     company_id = request.args.get('company_id', 1, type=int)
@@ -198,7 +198,7 @@ def _get_products():
     return jsonify(products)
 
 
-@admin.route('/_staffs/', methods=['GET'])
+@web_admin.route('/_staffs/', methods=['GET'])
 @sudo_required
 def _get_staffs():
     company_id = request.args.get('company_id', 1, type=int)
@@ -207,7 +207,7 @@ def _get_staffs():
     return jsonify(staffs)
 
 
-@admin.route('/_subscriptions/', methods=['GET'])
+@web_admin.route('/_subscriptions/', methods=['GET'])
 @sudo_required
 def _get_subscriptions():
     company_id = request.args.get('company_id', 1, type=int)
@@ -222,7 +222,7 @@ def _get_subscriptions():
     return jsonify({'last': text})
 
 
-@admin.route('/_get_cities', methods=['GET'])
+@web_admin.route('/_get_cities', methods=['GET'])
 def _get_cities():
     state_id = request.args.get('state_id', 1, type=int)
     state = State.query.filter_by(id=state_id).first()
@@ -230,7 +230,7 @@ def _get_cities():
     return jsonify(cities)
 
 
-@admin.route('/logout')
+@web_admin.route('/logout')
 @sudo_required
 def logout_route():
     logout_user()

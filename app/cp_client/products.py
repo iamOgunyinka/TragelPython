@@ -17,14 +17,6 @@ def get_products():
         .order_by(Product.id)
 
 
-@api.route('/get_products/<int:company_id>', methods=['GET'])
-@login_required
-def get_company_products(company_id):
-    products = [product.to_json() for product in Product.query.filter_by(company_id=company_id).order_by(
-        Product.name).all()]
-    return send_response(200, products)
-
-
 @api.route('/products/<int:product_id>', methods=['GET'])
 @login_required
 def get_product(product_id):

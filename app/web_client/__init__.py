@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-admin = Blueprint('web', __name__)
+web_admin = Blueprint('web', __name__)
 
 
 from . import views, forms

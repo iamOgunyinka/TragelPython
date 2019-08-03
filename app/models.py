@@ -24,7 +24,7 @@ class Company(db.Model):
     name = db.Column(db.String(128), index=True, nullable=False)
     official_email = db.Column(db.String(128), nullable=True)
     address = db.Column(db.String(256), nullable=False)
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
     date_of_creation = db.Column(db.DateTime, nullable=False, default=datetime.now)
     subscription_active = db.Column(db.Boolean(), default=False, nullable=False)
     staffs = db.relationship('User', backref='company')
