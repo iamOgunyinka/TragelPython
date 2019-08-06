@@ -62,9 +62,11 @@ def reset_password():
     json_data = request.get_json()
     if json_data is None:
         return send_response(400, 'This request contains invalid or no data')
-    new_password = json_data.get('new_password')
-    username = json_data.get('username')
-    user = db.session.query(User).filter_by(username=username,
+    new_password = json_data.get('new_password', '')
+    email = json_data.get('email', '')
+    if len(new_password)<8:
+        return send_response(400, 'Password too short')
+    user = db.session.query(User).filter_by(personal_email=email,
                                             company_id=current_user.company_id).first()
     if user is None:
         return send_response(404, 'The user with the information provided does '
@@ -74,7 +76,7 @@ def reset_password():
                              'You\'re not allowed to reset your own password\'s '
                              'while logged in')
     log_activity(event_type='PASSWORD RESET[reset_password]',
-                 by_=current_user.username, for_=username, why_='')
+                 by_=current_user.username, for_=email, why_='')
     user.password = new_password
     try:
         db.session.add(user)
@@ -91,25 +93,24 @@ def reset_password():
 @fully_subscribed
 def delete_user():
     payload = base64.b64decode(request.args.get('payload')).decode()
-    payload = payload.split(':')
+    payload = payload.split(':') if payload else ':'
     if len(payload) < 3:
         return send_response(401, 'Needs additional information')
-    username = payload[0]
+    email = payload[0]
     admin_password = payload[1]
     reason = payload[2]
     company_id = current_user.company_id
 
     if not current_user.verify_password(admin_password):
         return send_response(401, 'Password is incorrect')
-    user = db.session.query(User).filter_by(username=username,
-                                            company_id=company_id).first()
-    if user is None:
+    user = User.query.filter_by(personal_email=email, company_id=company_id).first()
+    if user is None or user == current_user:
         return send_response(404, 'The user with the information provided does '
                                   'not exist')
     user.deleted = True
     db.session.commit()
     log_activity(event_type='DELETE[delete_user]', by_=current_user.username,
-                 for_=username, why_=reason)
+                 for_=email, why_=reason)
     response = jsonify({'status': 'Successful', 'status_code': 200})
     response.status_code = 200
     return response
