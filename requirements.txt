@@ -10,7 +10,7 @@ Flask-Uploads==0.2.1
 Flask-WTF==0.14.2
 gevent==1.4.0
 gunicorn==19.9.0
-httplib2==0.18.0
+httplib2==0.19.0
 itsdangerous==1.1.0
 Jinja2==2.10.1
 psycopg2==2.8.2
